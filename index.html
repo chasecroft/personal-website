@@ -1,0 +1,2550 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Chase Croft — From trailhead.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,900;1,9..144,400;1,9..144,900&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<style>
+  :root {
+    --bg: #0A0A0B;
+    --ink: #E8E6E1;
+    --ink-dim: rgba(232,230,225,0.55);
+    --contour: rgba(232,230,225,0.12);
+    --accent: #FF6B47;
+    --rule: rgba(232,230,225,0.10);
+    --card: rgba(232,230,225,0.025);
+    --card-border: rgba(232,230,225,0.08);
+  }
+  html[data-theme="light"] {
+    --bg: #F4F1EA;
+    --ink: #1A1A1C;
+    --ink-dim: rgba(26,26,28,0.55);
+    --contour: rgba(26,26,28,0.18);
+    --accent: #FF6B47;
+    --rule: rgba(26,26,28,0.10);
+    --card: rgba(26,26,28,0.02);
+    --card-border: rgba(26,26,28,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--bg); color: var(--ink); }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 19px;
+    line-height: 1.55;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+    transition: background-color 400ms ease, color 400ms ease;
+  }
+  ::selection { background: var(--accent); color: #fff; }
+  .mono { font-family: 'JetBrains Mono', monospace; font-weight: 500; letter-spacing: 0.02em; }
+  .display { font-family: 'Fraunces', serif; font-weight: 900; letter-spacing: -0.04em; line-height: 0.9; font-variation-settings: "opsz" 144; }
+
+  /* ---------- Layout ---------- */
+  .wrap { max-width: 1320px; margin: 0 auto; padding: 0 6vw; position: relative; z-index: 2; }
+  section { padding: 14vh 0; position: relative; }
+  @media (max-width: 720px) { section { padding: 10vh 0; } }
+
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    margin-bottom: 3.5vh;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .eyebrow::before {
+    content: "";
+    width: 28px; height: 1px;
+    background: var(--accent);
+    display: inline-block;
+  }
+  .section-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    letter-spacing: -0.035em;
+    line-height: 0.95;
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    max-width: 18ch;
+    margin-bottom: 5vh;
+    text-wrap: balance;
+  }
+  .section-title em { font-style: italic; color: var(--accent); font-weight: 900; }
+
+  /* ---------- Topo SVG ---------- */
+  .topo {
+    position: fixed; inset: 0;
+    width: 100vw; height: 100vh;
+    z-index: 1;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .topo svg { width: 100%; height: 100%; display: block; }
+  .contour { fill: none; stroke: var(--contour); stroke-width: 1; stroke-linecap: round; stroke-linejoin: round; transition: stroke 400ms ease; }
+  .trail { fill: none; stroke: var(--accent); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 8px rgba(255,107,71,0.35)); }
+  .pin-group { opacity: 0; transform-origin: center; }
+  .pin-circle { fill: var(--bg); stroke: var(--accent); stroke-width: 1.5; transition: fill 400ms ease; }
+  .pin-circle.summit { fill: var(--accent); stroke: var(--accent); stroke-width: 2; }
+  .pin-num { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 500; fill: var(--accent); text-anchor: middle; dominant-baseline: central; }
+  .pin-num.summit { fill: var(--bg); font-weight: 600; }
+  .lead-dot { fill: var(--accent); filter: drop-shadow(0 0 6px rgba(255,107,71,0.8)) drop-shadow(0 0 12px rgba(255,107,71,0.5)); opacity: 0; }
+  /* Mobile: hide trail, pins, and leading-edge dot — keep contour background */
+  @media (max-width: 720px) {
+    .trail, .pin-group, .lead-dot { display: none !important; }
+  }
+  .pin-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 500; fill: var(--ink-dim); text-anchor: middle; letter-spacing: 0.1em; text-transform: uppercase; transition: fill 400ms ease; }
+
+  /* ---------- Theme toggle ---------- */
+  .toggle {
+    position: fixed; top: 22px; right: 24px;
+    z-index: 50;
+    background: transparent;
+    border: none;
+    padding: 4px 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    cursor: pointer;
+    transition: color 200ms ease;
+  }
+  .toggle:hover { color: var(--accent); }
+
+  /* ---------- Hero ---------- */
+  .hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; padding-top: 18vh; padding-bottom: 14vh; }
+  .hero .wrap { width: 100%; }
+  .hero h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: clamp(4rem, 12vw, 11rem);
+    line-height: 0.9;
+    letter-spacing: -0.045em;
+    margin: 0;
+    margin-left: -0.04em;
+    font-variation-settings: "opsz" 144;
+  }
+  .hero h1 .word { display: inline-block; white-space: nowrap; }
+  .hero h1 .char { display: inline-block; will-change: transform; }
+  .hero h1 .char-mask { display: inline-block; overflow: hidden; line-height: 1; padding: 0.08em 0; vertical-align: baseline; }
+  .hero .subhead {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(2rem, 6vw, 5.5rem);
+    line-height: 0.95;
+    letter-spacing: -0.035em;
+    color: var(--accent);
+    margin-top: -0.05em;
+    margin-bottom: 6vh;
+    font-variation-settings: "opsz" 144;
+  }
+  .hero .subhead .word { display: inline-block; white-space: nowrap; }
+  .hero .subhead .char { display: inline-block; will-change: transform; }
+  .hero .subhead .char-mask { display: inline-block; overflow: hidden; line-height: 1; padding: 0.08em 0; vertical-align: baseline; }
+  .hero .pitch {
+    font-size: clamp(1.15rem, 1.5vw, 1.4rem);
+    line-height: 1.5;
+    max-width: 65ch;
+    color: var(--ink);
+    opacity: 0;
+    margin-bottom: 5vh;
+    text-wrap: pretty;
+  }
+  .hero .creds {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-dim);
+    letter-spacing: 0.06em;
+    opacity: 0;
+  }
+  .hero .creds span { padding: 0 4px; }
+  .hero .creds span:first-child { padding-left: 0; }
+
+  .scroll-cue {
+    position: absolute; bottom: 5vh; left: 6vw;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-dim);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .scroll-cue .line {
+    width: 1px; height: 36px; background: var(--ink-dim);
+    animation: scrollPulse 2.4s ease-in-out infinite;
+    transform-origin: top;
+  }
+  @keyframes scrollPulse {
+    0%,100% { transform: scaleY(0.3); opacity: 0.5; }
+    50% { transform: scaleY(1); opacity: 1; }
+  }
+
+  /* ---------- Guide ---------- */
+  .guide-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    gap: 6vw;
+    align-items: start;
+    position: relative;
+    z-index: 3;
+    isolation: isolate;
+  }
+  @media (max-width: 820px) {
+    .guide-grid { grid-template-columns: 1fr; gap: 6vh; }
+  }
+  .guide-body { max-width: 36ch; font-size: clamp(1.1rem, 1.4vw, 1.3rem); line-height: 1.55; }
+  .guide-body p + p { margin-top: 1.4em; }
+  .guide-body p:last-child { color: var(--ink-dim); font-style: italic; font-family: 'Fraunces', serif; font-weight: 400; font-size: 1.15em; }
+  .guide-portrait { margin: 0; max-width: 380px; justify-self: start; }
+  .guide-portrait-img {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    border: 1px solid color-mix(in oklab, var(--accent) 30%, transparent);
+    background: color-mix(in oklab, var(--accent) 8%, transparent);
+    overflow: hidden;
+  }
+  .guide-portrait-img img {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover; object-position: center top;
+    display: block;
+    filter: grayscale(60%) sepia(15%) contrast(1.05) brightness(0.98);
+    z-index: 2;
+  }
+  .guide-portrait-placeholder {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    text-align: center; padding: 0 2rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: color-mix(in oklab, var(--accent) 60%, var(--ink));
+    z-index: 1;
+  }
+  /* If the <img> fails to load, the placeholder remains visible underneath. */
+  .guide-portrait-img img[src=""], .guide-portrait-img img:not([src]) { display: none; }
+  .guide-portrait-cap {
+    margin: 12px 0 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--ink-dim);
+    letter-spacing: 0.04em;
+  }
+  .guide-portrait-cap::before { content: "— "; color: var(--accent); margin-right: 2px; }
+
+  /* ---------- Kit ---------- */
+  .kit-list {
+    display: flex; flex-direction: column; gap: 0;
+    max-width: 60ch;
+    position: relative;
+    z-index: 3;
+    isolation: isolate;
+  }
+  .kit-item {
+    padding: 5vh 0;
+    border-top: 1px solid var(--rule);
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+  .kit-item:last-child { border-bottom: 1px solid var(--rule); }
+  .kit-icon {
+    color: var(--accent);
+    padding-top: 6px;
+    display: flex; align-items: flex-start; justify-content: flex-start;
+    line-height: 0;
+  }
+  .kit-icon svg { display: block; }
+  .kit-freq {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.10em;
+    color: var(--ink-dim);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    line-height: 1;
+  }
+  .kit-freq .dash { color: var(--accent); margin-right: 4px; }
+  .kit-headline {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: clamp(1.4rem, 2vw, 1.75rem);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    margin-bottom: 1.5vh;
+  }
+  .kit-headline.italic { font-style: italic; }
+  .kit-body { font-size: 1.05rem; color: var(--ink-dim); max-width: 38ch; line-height: 1.55; }
+  @media (max-width: 720px) {
+    .kit-item { grid-template-columns: 60px 1fr; }
+  }
+
+  /* ---------- Trips logged ---------- */
+  .trips-section-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 4vw; }
+  .trips-nav {
+    display: flex; gap: 16px; align-items: center;
+    margin-top: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    line-height: 1;
+  }
+  .trips-nav button {
+    background: none; border: none; padding: 8px;
+    color: var(--accent);
+    cursor: pointer;
+    line-height: 0;
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: transform 150ms ease, opacity 150ms ease;
+  }
+  .trips-nav button svg { display: block; }
+  #tripsPrev:hover:not(.dim) { transform: translateX(-2px); }
+  #tripsNext:hover:not(.dim) { transform: translateX(2px); }
+  .trips-nav button.dim { opacity: 0.25; pointer-events: none; cursor: default; }
+  .trips-pageind {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    color: var(--ink-dim);
+    user-select: none;
+    min-width: 56px;
+    text-align: center;
+  }
+  .trips-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; background: var(--rule); border: 1px solid var(--rule); transition: opacity 280ms ease; }
+  .trips-grid.fading { opacity: 0; }
+  @media (max-width: 720px) { .trips-grid { grid-template-columns: 1fr; } }
+  .trip {
+    background: var(--bg);
+    padding: 5vh 4vw;
+    position: relative;
+    min-height: 280px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: background 300ms ease;
+    overflow: hidden;
+  }
+  .trip:hover { background: var(--card); }
+  /* Tiny topo sketch behind the metric */
+  .trip-topo {
+    position: absolute;
+    top: 6px; right: 8px;
+    width: 96px; height: 70px;
+    pointer-events: none;
+    opacity: 0.10;
+  }
+  .trip-topo svg { width: 100%; height: 100%; display: block; overflow: visible; }
+  .trip-topo path { fill: none; stroke: var(--ink); stroke-width: 1; stroke-linejoin: round; stroke-linecap: round; }
+  .trip-elev {
+    position: absolute; top: 18px; right: 22px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    z-index: 2;
+  }
+  .trip-elev::before { content: "▲ "; color: var(--accent); }
+  .trip-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-dim);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 1.2vh;
+    margin-top: 4vh;
+  }
+  .trip-name {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: clamp(1.6rem, 2.4vw, 2rem);
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin-bottom: 1.5vh;
+    margin-top: 0;
+  }
+  .trip-role { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-dim); letter-spacing: 0.06em; margin-bottom: 4vh; }
+  .trip-outcome { font-size: 1.05rem; color: var(--ink); margin-bottom: 2.5vh; max-width: 32ch; line-height: 1.45; }
+  .trip-outcome .kicker { display: block; margin-top: 0.6em; color: var(--ink-dim); font-style: italic; font-family: 'Fraunces', serif; font-size: 1em; }
+  .trip-link {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    align-self: flex-start;
+    transition: border-color 200ms ease;
+  }
+  .trip-link:hover { border-bottom-color: var(--accent); }
+
+  /* ---------- On the mountain (Snug — second hero moment) ---------- */
+  #s4 {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .snug-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+    gap: 6vw;
+    align-items: start;
+  }
+  /* Left column gets an opaque page-bg panel so the trail visibly passes behind
+     instead of crashing through the body copy. Padding extends the panel a
+     touch beyond the text edges so the cutout reads as deliberate. */
+  .snug-left {
+    position: relative;
+    background: var(--bg);
+    padding: 4vh 2.5vw 4vh 0;
+    margin: -4vh 0 -4vh -2.5vw;
+    transition: background-color 400ms ease;
+  }
+  @media (max-width: 980px) {
+    .snug-grid { grid-template-columns: 1fr; gap: 8vh; }
+  }
+  .snug-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    color: var(--ink-dim);
+    letter-spacing: 0.08em;
+    line-height: 1.9;
+    margin-bottom: 6vh;
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    column-gap: 18px;
+    max-width: 360px;
+  }
+  .snug-meta dt {
+    color: var(--ink-dim);
+    text-transform: uppercase;
+    opacity: 0.7;
+  }
+  .snug-meta dd {
+    color: var(--ink);
+    margin: 0;
+  }
+  .snug-meta dd.live { color: var(--accent); display: flex; align-items: center; gap: 10px; }
+  .snug-meta dd.live::before {
+    content: "";
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 0 var(--accent);
+    animation: pulse 2.4s infinite;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(255,107,71,0.5); }
+    70% { box-shadow: 0 0 0 12px rgba(255,107,71,0); }
+    100% { box-shadow: 0 0 0 0 rgba(255,107,71,0); }
+  }
+  .snug-name {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: clamp(5rem, 10vw, 9rem);
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+    margin: 0 0 3vh -0.04em;
+    font-variation-settings: "opsz" 144;
+  }
+  .snug-name .beacon { color: var(--accent); }
+  .snug-tagline {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(1.5rem, 2vw, 2rem);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    max-width: 22ch;
+    margin-bottom: 5vh;
+    font-variation-settings: "opsz" 144;
+  }
+  .snug-body {
+    max-width: 46ch;
+    color: var(--ink-dim);
+    margin-bottom: 6vh;
+    line-height: 1.6;
+    font-size: 1.05rem;
+  }
+  .snug-body p + p { margin-top: 1.1em; }
+
+  /* The Number — third typographic moment between tagline and body */
+  .snug-callout {
+    margin: 1vh 0 6vh 0;
+    max-width: 46ch;
+  }
+  .snug-callout-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    margin-bottom: 1.6vh;
+  }
+  .snug-callout-figure {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: clamp(3rem, 5vw, 4.5rem);
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+    color: var(--accent);
+    font-variation-settings: "opsz" 144;
+    margin-bottom: 1.4vh;
+    display: inline-flex;
+    align-items: baseline;
+  }
+  .snug-callout-figure .x {
+    font-weight: 400;
+    font-style: italic;
+    margin-left: 0.04em;
+    font-size: 0.85em;
+  }
+  .snug-callout-caption {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 1.1rem;
+    line-height: 1.4;
+    color: var(--ink);
+    max-width: 30ch;
+  }
+  .snug-ctas {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    flex-wrap: wrap;
+  }
+  .text-link {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 4px;
+    transition: color 200ms ease, border-color 200ms ease;
+  }
+  .text-link:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .snug-right {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4vh;
+    position: relative;
+  }
+  .peak-frame {
+    position: relative;
+    aspect-ratio: 5 / 4;
+    width: 100%;
+    max-width: 520px;
+  }
+  .peak-frame svg { width: 100%; height: 100%; display: block; overflow: visible; }
+  .peak-contour { fill: none; stroke: var(--ink); stroke-opacity: 0.22; stroke-width: 1; stroke-linejoin: round; stroke-linecap: round; }
+  .peak-contour.index { stroke-opacity: 0.42; stroke-width: 1.4; }
+  .peak-flagpole { stroke: var(--accent); stroke-width: 1.5; stroke-linecap: round; }
+  .peak-flag { fill: var(--accent); }
+  .peak-summit-dot { fill: var(--accent); filter: drop-shadow(0 0 6px rgba(255,107,71,0.8)) drop-shadow(0 0 14px rgba(255,107,71,0.4)); }
+  .peak-corner {
+    position: absolute;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+  }
+  .peak-corner.tl { top: 0; left: 0; }
+  .peak-corner.br { bottom: 0; right: 0; color: var(--accent); }
+
+  .snug-stats {
+    display: grid;
+    grid-template-columns: 1fr;
+    max-width: 520px;
+    position: relative;
+    background: var(--bg);
+    transition: background-color 400ms ease;
+  }
+  .snug-stats .row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: baseline;
+    padding: 14px 0;
+    border-top: 1px solid var(--rule);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .snug-stats .row:last-child { border-bottom: 1px solid var(--rule); }
+  .snug-stats .row .k { color: var(--ink-dim); }
+  .snug-stats .row .v {
+    color: var(--ink);
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    text-transform: none;
+  }
+  .snug-stats .row .v.accent { color: var(--accent); }
+
+  .ctas { display: flex; gap: 12px; flex-wrap: wrap; }
+  .btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 14px 22px;
+    border: 1px solid var(--rule);
+    color: var(--ink);
+    background: transparent;
+    text-decoration: none;
+    transition: all 200ms ease;
+    cursor: pointer;
+    display: inline-flex; align-items: center; gap: 10px;
+  }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .btn.primary:hover { background: transparent; color: var(--accent); }
+
+  /* ---------- Investor info modal ---------- */
+  .modal-backdrop {
+    position: fixed; inset: 0;
+    z-index: 100;
+    background: rgba(10,10,11,0.7);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    opacity: 0;
+    transition: opacity 200ms ease;
+  }
+  html[data-theme="light"] .modal-backdrop { background: rgba(244,241,234,0.78); }
+  .modal-backdrop.open { display: flex; opacity: 1; }
+  .modal-panel {
+    background: var(--bg);
+    border: 1px solid var(--rule);
+    width: 100%;
+    max-width: 480px;
+    padding: 48px;
+    position: relative;
+    transform: scale(0.96);
+    transition: transform 220ms ease;
+  }
+  .modal-backdrop.open .modal-panel { transform: scale(1); }
+  .modal-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    margin-bottom: 18px;
+  }
+  .modal-eyebrow::before { content: ""; display: inline-block; width: 24px; height: 1px; background: var(--accent); vertical-align: middle; margin-right: 12px; }
+  .modal-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 2rem;
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    margin-bottom: 14px;
+  }
+  .modal-sub { color: var(--ink-dim); font-size: 0.98rem; line-height: 1.5; margin-bottom: 28px; max-width: 38ch; }
+  .modal-form { display: flex; flex-direction: column; gap: 18px; }
+  .modal-field { display: flex; flex-direction: column; gap: 8px; }
+  .modal-field label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+  }
+  .modal-field input {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--rule);
+    padding: 8px 0;
+    color: var(--ink);
+    outline: none;
+    transition: border-color 180ms ease;
+    border-radius: 0;
+  }
+  .modal-field input:focus { border-bottom-color: var(--accent); }
+  .modal-actions { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-top: 14px; }
+  .modal-back {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    background: none; border: none; cursor: pointer; padding: 0;
+    transition: color 180ms ease;
+  }
+  .modal-back:hover { color: var(--ink); }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 36px;
+    left: 50%;
+    transform: translateX(-50%) translateY(8px);
+    z-index: 110;
+    background: var(--bg);
+    border: 1px solid var(--rule);
+    padding: 14px 22px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink);
+    border-bottom: 2px solid var(--accent);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 200ms ease, transform 200ms ease;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ---------- Trip report (case study) page ---------- */
+  body.case-active #homeRoot { display: none; }
+  body:not(.case-active) #caseRoot { display: none; }
+  #caseRoot {
+    position: relative;
+    z-index: 2;
+    opacity: 0;
+    transition: opacity 200ms ease;
+  }
+  #caseRoot.in { opacity: 1; }
+  .case-wrap { max-width: 720px; margin: 0 auto; padding: 0 6vw; position: relative; z-index: 2; }
+  .case-header {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    padding: 4vh 6vw;
+    max-width: 1320px;
+    margin: 0 auto;
+    gap: 2vw;
+  }
+  .case-back {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: color 180ms ease, border-color 180ms ease;
+    justify-self: start;
+  }
+  .case-back:hover { color: var(--ink); border-bottom-color: var(--ink-dim); }
+  .case-id {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    justify-self: center;
+  }
+  .case-hero { padding-top: 6vh; padding-bottom: 4vh; }
+  .case-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    margin-bottom: 3vh;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .case-eyebrow::before {
+    content: ""; width: 28px; height: 1px; background: var(--accent); display: inline-block;
+  }
+  .case-name {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: clamp(5rem, 10vw, 9rem);
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+    margin: 0 0 3vh -0.04em;
+    font-variation-settings: "opsz" 144;
+  }
+  .case-name .beacon { color: var(--accent); }
+  .case-tagline {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(1.5rem, 2vw, 2rem);
+    line-height: 1.25;
+    color: var(--ink);
+    max-width: 28ch;
+    margin-bottom: 6vh;
+    font-variation-settings: "opsz" 144;
+  }
+  .case-meta {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    column-gap: 24px;
+    row-gap: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    color: var(--ink);
+    max-width: 460px;
+    margin-bottom: 6vh;
+    background: var(--bg);
+    position: relative;
+  }
+  .case-meta dt { color: var(--ink-dim); text-transform: uppercase; letter-spacing: 0.16em; font-size: 11px; padding-top: 2px; }
+  .case-meta dd { margin: 0; }
+  .case-metric {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: clamp(2.5rem, 4vw, 4rem);
+    color: var(--accent);
+    letter-spacing: -0.03em;
+    line-height: 0.95;
+    margin-bottom: 4vh;
+    background: var(--bg);
+  }
+  .case-metric::before { content: "▲ "; }
+  .case-section { padding: 14vh 0; position: relative; }
+  .case-section + .case-section { padding-top: 0; }
+  .case-section h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: clamp(2rem, 3.5vw, 2.8rem);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    margin: 2vh 0 4vh;
+  }
+  .case-section .case-eyebrow { margin-bottom: 2vh; }
+  .case-prose {
+    font-size: 1.1rem;
+    line-height: 1.65;
+    color: var(--ink);
+    background: var(--bg);
+    position: relative;
+  }
+  .case-prose p + p { margin-top: 1.4em; }
+  .case-prose .placeholder-note {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 3vh;
+  }
+  .case-callout {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(0.95rem, 1.2vw, 1.1rem);
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    text-transform: uppercase;
+    border-top: 1px solid var(--accent);
+    border-bottom: 1px solid var(--accent);
+    padding: 3vh 0;
+    margin: 4vh 0;
+    line-height: 1.4;
+  }
+  .case-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    margin: 6vh 0 0;
+    background: var(--bg);
+  }
+  /* Image slots */
+  .case-figure {
+    margin: 0;
+    display: block;
+  }
+  .case-figure.hero { margin: 14vh 0 10vh; }
+  .case-figure.inline {
+    width: 80%;
+    margin: 4vh auto;
+  }
+  .case-figure .case-img {
+    display: block;
+    width: 100%;
+    border: 1px solid color-mix(in oklab, var(--accent) 30%, transparent);
+    background: color-mix(in oklab, var(--accent) 8%, transparent);
+    aspect-ratio: 16 / 10;
+    color: color-mix(in oklab, var(--accent) 60%, var(--ink));
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    display: flex; align-items: center; justify-content: center;
+    text-align: center;
+    padding: 0 2rem;
+  }
+  .case-figure .case-cap {
+    margin: 12px 0 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--ink-dim);
+    letter-spacing: 0.04em;
+  }
+  .case-figure .case-cap::before {
+    content: "— ";
+    color: var(--accent);
+    margin-right: 2px;
+  }
+  @media (max-width: 720px) {
+    .case-stats { grid-template-columns: repeat(2, 1fr); }
+  }
+  .case-stat {
+    padding: 2vh 1.5vw;
+    border-left: 1px solid var(--accent);
+    display: flex; flex-direction: column; gap: 1vh;
+  }
+  .case-stat:first-child { border-left: none; padding-left: 0; }
+  @media (max-width: 720px) {
+    .case-stat:nth-child(3) { border-left: none; padding-left: 0; }
+  }
+  .case-stat .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+  }
+  .case-stat .num {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: clamp(2rem, 3.5vw, 3.5rem);
+    color: var(--accent);
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+  }
+  .case-kicker {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(1.3rem, 2vw, 1.7rem);
+    color: var(--ink);
+    line-height: 1.3;
+    max-width: 36ch;
+    margin-top: 4vh;
+    background: var(--bg);
+  }
+  .case-footer {
+    text-align: center;
+    padding: 14vh 0 10vh;
+  }
+  .case-footer .case-back {
+    justify-self: unset;
+    font-size: 13px;
+    letter-spacing: 0.18em;
+  }
+  .case-footer .filed {
+    display: block;
+    margin-top: 3vh;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    opacity: 0.6;
+  }
+
+  /* ---------- Trail reports / testimonials ---------- */
+  .reports { display: flex; flex-direction: column; gap: 6vh; max-width: 64ch; position: relative; z-index: 3; isolation: isolate; }
+  .report {
+    border-top: 1px solid var(--rule);
+    padding-top: 4vh;
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 2vw;
+  }
+  @media (max-width: 720px) { .report { grid-template-columns: 1fr; gap: 2vh; } }
+  .report-meta { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-dim); letter-spacing: 0.06em; line-height: 1.6; }
+  .report-meta div:first-child { color: var(--accent); margin-bottom: 4px; }
+  .report-header { font-family: 'Fraunces', serif; font-style: italic; font-weight: 400; font-size: clamp(1.4rem, 2vw, 1.7rem); line-height: 1.2; margin-bottom: 2.5vh; color: var(--ink); }
+  .report-meta div:nth-child(3) { white-space: nowrap; }
+  .report-meta .cond-word { color: var(--accent); }
+  .report-body { font-family: 'Inter', sans-serif; font-style: normal; font-weight: 400; font-size: 1.05rem; line-height: 1.65; color: var(--ink-dim); margin-bottom: 2.5vh; max-width: 42ch; }
+  .report-attr { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: var(--ink-dim); letter-spacing: 0.16em; text-transform: uppercase; }
+
+  /* ---------- CTA ---------- */
+  .cta { min-height: 95vh; display: flex; flex-direction: column; justify-content: center; }
+  .cta .wrap { width: 100%; }
+  .cta-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 5vw;
+    align-items: center;
+  }
+  @media (max-width: 980px) { .cta-grid { grid-template-columns: 1fr; gap: 8vh; } }
+  .nbsp-lock { white-space: nowrap; }
+  .cta-right {
+    position: relative;
+    min-height: 280px;
+  }
+  /* Fixed summit cluster — anchored to the topo SVG's summit screen point.
+     Position is set in JS based on viewport. Visible only when CTA in view. */
+  .summit-cluster {
+    position: fixed;
+    z-index: 5;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 360ms ease, transform 360ms ease;
+  }
+  .summit-cluster.show {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+  .summit-pin {
+    position: absolute;
+    left: -32px; top: -32px; /* center on anchor point */
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--bg);
+    transform: scale(0);
+    will-change: transform;
+  }
+  .summit-label {
+    position: absolute;
+    left: -50px; top: 38px;
+    width: 100px;
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    opacity: 0;
+    transition: opacity 400ms ease;
+  }
+  .summit-label.in { opacity: 1; }
+  .summit-cta {
+    position: absolute;
+    left: 28px;
+    top: 38px;
+    pointer-events: none;
+    white-space: nowrap;
+    min-width: 280px;
+    justify-content: center;
+  }
+  .summit-cluster.show .summit-cta { pointer-events: auto; }
+  /* Mobile CTA — visible only under 980px to replace the hidden summit cluster */
+  .mobile-cta { display: none; }
+  @media (max-width: 980px) {
+    .summit-cluster { display: none; }
+    .cta-right { min-height: 0; }
+    .mobile-cta {
+      display: inline-flex;
+      align-self: flex-start;
+      margin-top: 2vh;
+      padding: 18px 26px;
+      font-size: 13px;
+    }
+  }
+  .cta-headline {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: clamp(2.5rem, 9vw, 10rem);
+    line-height: 0.88;
+    letter-spacing: -0.045em;
+    margin-bottom: 4vh;
+    text-wrap: balance;
+  }
+  .cta-headline em { font-style: italic; color: var(--accent); }
+  .cta-sub {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(1.3rem, 2vw, 1.7rem);
+    color: var(--ink-dim);
+    margin-bottom: 6vh;
+  }
+
+  /* ---------- Footer ---------- */
+  footer {
+    border-top: 1px solid var(--rule);
+    padding: 6vh 6vw;
+    margin-top: 10vh;
+    position: relative; z-index: 2;
+  }
+  .footer-inner {
+    max-width: 1320px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 4vw;
+    flex-wrap: wrap;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-dim);
+    letter-spacing: 0.06em;
+  }
+  .footer-inner a { color: var(--ink-dim); text-decoration: none; transition: color 200ms ease; }
+  .footer-inner a:hover { color: var(--accent); }
+  .footer-links { display: flex; gap: 24px; }
+  .footer-offtrail { opacity: 0.5; font-size: 10px; }
+
+  /* ---------- Pixelate easter egg ---------- */
+  .pixelated svg { image-rendering: pixelated; filter: url(#pixelate); }
+
+  /* ---------- Reduced motion ---------- */
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+    .hero h1 .char { transform: none !important; }
+    .hero .pitch, .hero .creds { opacity: 1 !important; }
+    .pin-group { opacity: 1 !important; }
+    .scroll-cue .line { animation: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Theme toggle -->
+<button class="toggle" id="themeToggle" aria-label="Toggle color theme">
+  <span id="themeLabel">DARK</span>
+</button>
+
+<div id="homeRoot">
+
+<!-- Topo SVG layer (fixed) -->
+<div class="topo" id="topo" aria-hidden="true">
+  <svg viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <filter id="pixelate" x="0" y="0">
+        <feFlood x="2" y="2" height="2" width="2"/>
+        <feComposite width="6" height="6"/>
+        <feTile result="a"/>
+        <feComposite in="SourceGraphic" in2="a" operator="in"/>
+        <feMorphology operator="dilate" radius="2"/>
+      </filter>
+    </defs>
+    <g id="topoGroup">
+      <g id="contours"></g>
+      <path id="trail" class="trail" d=""></path>
+      <g id="pins"></g>
+      <circle id="leadDot" class="lead-dot" r="6" cx="0" cy="0"></circle>
+    </g>
+  </svg>
+</div>
+
+<!-- 00 Hero -->
+<section class="hero" id="s0" data-section="0">
+  <div class="wrap">
+    <div class="eyebrow">00 — TRAILHEAD</div>
+    <h1 id="heroHeadline" aria-label="From trailhead.">
+      <!-- char masks injected by JS -->
+    </h1>
+    <p class="subhead" id="heroSubhead" aria-label="to summit."></p>
+    <p class="pitch" id="heroPitch">I'm Chase. I help founders go from zero to one — the messy first product, the first ten customers, the first version of the team.</p>
+    <div class="creds" id="heroCreds">
+      <span>Denver, CO</span><span>·</span><span>Seven 0-to-1 products</span><span>·</span><span>Consumer &amp; prosumer</span>
+    </div>
+  </div>
+  <div class="scroll-cue">
+    <span class="line"></span>
+    <span>Scroll</span>
+  </div>
+</section>
+
+<!-- 01 The Guide -->
+<section id="s1" data-section="1">
+  <div class="wrap">
+    <div class="eyebrow">01 — THE GUIDE</div>
+    <h2 class="section-title">Who's <em>leading</em> this hike.</h2>
+    <div class="guide-grid">
+     <div class="guide-body">
+      <p>I've built seven products from zero to one — twice as a founder, three times early at startups, twice inside Dropbox and Walmart's incubators.</p>
+      <p>I'm best in the fog — the part where the product is half-built, the customer isn't sure what they want, and the team is figuring out who does what. The first ugly version is my favorite version.</p>
+      <p>When I'm not building, I'm somewhere above 10,000 feet.</p>
+     </div>
+     <figure class="guide-portrait">
+       <div class="guide-portrait-img">
+         <img src="assets/chase-portrait.jpg" alt="Chase, founder photo">
+         <span class="guide-portrait-placeholder">[ PORTRAIT — REPLACE ]</span>
+       </div>
+       <figcaption class="guide-portrait-cap">Rocky Mountain National Park</figcaption>
+     </figure>
+    </div>
+  </div>
+</section>
+
+<!-- 02 The Kit -->
+<section id="s2" data-section="2">
+  <div class="wrap">
+    <div class="eyebrow">02 — THE KIT</div>
+    <h2 class="section-title">What's in the <em>pack</em>.</h2>
+    <div class="kit-list">
+      <div class="kit-item">
+        <div class="kit-icon" aria-hidden="true">
+          <svg viewBox="0 0 32 32" width="32" height="32">
+            <line x1="9" y1="4" x2="9" y2="28" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"></line>
+            <path d="M9 5 L23 10 L9 15 Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="miter"></path>
+            <line x1="4" y1="28" x2="14" y2="28" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"></line>
+          </svg>
+        </div>
+        <div class="kit-text">
+          <div class="kit-freq"><span class="dash">—</span> EVERY STAGE</div>
+          <div class="kit-headline">Finding the real product.</div>
+          <p class="kit-body">Most "0 to 1" is actually "negative one to zero" — figuring out what to even build. I run small, fast cycles with real users until the product earns its right to exist.</p>
+        </div>
+      </div>
+      <div class="kit-item">
+        <div class="kit-icon" aria-hidden="true">
+          <svg viewBox="0 0 32 32" width="32" height="32">
+            <circle cx="16" cy="16" r="11" fill="none" stroke="currentColor" stroke-width="1.5"></circle>
+            <path d="M16 7 L19 16 L16 25 L13 16 Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="miter"></path>
+            <path d="M7 16 L16 13 L25 16 L16 19 Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="miter"></path>
+            <circle cx="16" cy="4.5" r="1" fill="currentColor" stroke="none"></circle>
+          </svg>
+        </div>
+        <div class="kit-text">
+          <div class="kit-freq"><span class="dash">—</span> EARLY STAGE</div>
+          <div class="kit-headline italic">The first ten customers.</div>
+          <p class="kit-body">Acquisition is a craft, not a channel. I've built distribution from cold DMs to paid loops to founder-led sales. Whatever the first ten need, that's what we do.</p>
+        </div>
+      </div>
+      <div class="kit-item">
+        <div class="kit-icon" aria-hidden="true">
+          <svg viewBox="0 0 32 32" width="32" height="32">
+            <path d="M16 5 L28 26 L4 26 Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="miter"></path>
+            <line x1="16" y1="5" x2="16" y2="26" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"></line>
+            <line x1="2" y1="26" x2="30" y2="26" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"></line>
+          </svg>
+        </div>
+        <div class="kit-text">
+          <div class="kit-freq"><span class="dash">—</span> WHEN IT GETS REAL</div>
+          <div class="kit-headline">The first version of the team.</div>
+          <p class="kit-body">Knowing who to hire first, what to outsource, and what the founder must hold. I've made every staffing mistake; you don't have to.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 03 Trips Logged -->
+<section id="s3" data-section="3" data-screen-label="03 Trips Logged">
+  <div class="wrap">
+    <div class="trips-section-head">
+      <div>
+        <div class="eyebrow">03 — TRIPS LOGGED</div>
+        <h2 class="section-title">Summits already <em>climbed</em>.</h2>
+      </div>
+      <div class="trips-nav" id="tripsNav" aria-label="Paginate projects">
+        <button type="button" id="tripsPrev" aria-label="Previous projects">
+          <svg viewBox="0 0 32 32" width="32" height="32" aria-hidden="true">
+            <path d="M21 6 L9 16 L21 26" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter"></path>
+          </svg>
+        </button>
+        <span class="trips-pageind" id="tripsPageInd">01 / 02</span>
+        <button type="button" id="tripsNext" aria-label="Next projects">
+          <svg viewBox="0 0 32 32" width="32" height="32" aria-hidden="true">
+            <path d="M11 6 L23 16 L11 26" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div class="trips-grid" id="tripsGrid"></div>
+  </div>
+</section>
+
+<script id="trips-data" type="application/json">
+[
+  {
+    "name": "Lantern",
+    "tag": "// PRODUCT LAUNCH",
+    "metric": "50K MAU",
+    "role": "FOUNDER · 2018–2021",
+    "outcome": "Consumer journaling app. 0 → 50k MAU in 9 months, acquired by a wellness platform.",
+    "kicker": "Defined the wedge that made acquisition cheap."
+  },
+  {
+    "name": "Field Notes",
+    "tag": "// INTERNAL TOOL",
+    "metric": "6 PILOTS",
+    "role": "EARLY PM · DROPBOX INCUBATOR · 2016–2018",
+    "outcome": "Internal collaboration tool for field teams. Shipped MVP in 11 weeks, 6 enterprise pilots.",
+    "kicker": "Won internal greenlight to ship at scale."
+  },
+  {
+    "name": "Cart Studio",
+    "tag": "// 0→MARKET",
+    "metric": "40+ CUSTOMERS",
+    "role": "PROD LEAD · WALMART STORE №8 · 2021–2023",
+    "outcome": "Headless commerce SDK for emerging brands. 40+ paying customers in year one.",
+    "kicker": "Shifted the platform's monetization model."
+  },
+  {
+    "name": "Pinecone Labs",
+    "tag": "// FOUNDING TEAM",
+    "metric": "$2M RAISED",
+    "role": "CO-FOUNDER · 2014–2017",
+    "outcome": "Prosumer audio tools. $2M raised, profitable by year two, sold to a hardware OEM.",
+    "kicker": "Sold the company two years after launch."
+  },
+  {
+    "name": "Foothill",
+    "tag": "// GROWTH",
+    "metric": "3X RETENTION",
+    "role": "PROD LEAD · 2019–2020",
+    "outcome": "Subscription wellness platform. Doubled monthly retention through onboarding redesign and milestone-based reactivation.",
+    "kicker": "Made the metric the team optimized for."
+  },
+  {
+    "name": "Bivy",
+    "tag": "// FOUNDING TEAM",
+    "metric": "SERIES A",
+    "role": "EARLY PM · 2017–2019",
+    "outcome": "Outdoor logistics marketplace. Took the product from beta to Series A close in 14 months.",
+    "kicker": "Defined the marketplace mechanics that scaled."
+  },
+  {
+    "name": "Cairn Health",
+    "tag": "// 0→MARKET",
+    "metric": "12 LAUNCH PARTNERS",
+    "role": "FOUNDER · 2015–2017",
+    "outcome": "Telehealth scheduling for clinics. Launched with 12 paying clinic partners in year one.",
+    "kicker": "Validated demand before the category had a name."
+  },
+  {
+    "name": "Compass",
+    "tag": "// INTERNAL TOOL",
+    "metric": "ADOPTED CO-WIDE",
+    "role": "PROD LEAD · WALMART INCUBATOR · 2020–2021",
+    "outcome": "Internal goal-setting tool. Adopted across 14 corporate teams within six months of launch.",
+    "kicker": "Replaced quarterly review chaos with a working ritual."
+  }
+]
+</script>
+<!--
+  DEMO STATE: 8 cards to show pagination affordance.
+  To trim to default 4-card view, remove cards 5-8 from this array.
+  The pagination arrows will automatically hide when length ≤ 4.
+
+  HOW TO ADD MORE TRIPS LATER:
+  Add additional project objects to the JSON above (after the last item, with a
+  preceding comma — JSON does not allow trailing commas or block comments).
+  When trips.length > 4, the ← / → arrows appear in the section header and
+  paginate 4 at a time.
+
+  Object shape:
+    {
+      "name": "Newer Thing",
+      "tag": "// PROTOTYPE",
+      "metric": "12 DESIGN PARTNERS",
+      "role": "ADVISOR · 2024",
+      "outcome": "Short summary line.",
+      "kicker": "What changed because of the work."
+    }
+-->
+
+<!-- 04 On the mountain -->
+<section id="s4" data-section="4" data-screen-label="04 On the Mountain">
+  <div class="wrap">
+    <div class="eyebrow">04 — ON THE MOUNTAIN</div>
+    <div class="snug-grid">
+      <div class="snug-left">
+        <dl class="snug-meta">
+          <dt>Elev.</dt><dd>14,440 ft</dd>
+          <dt>Status</dt><dd class="live">In progress</dd>
+          <dt>Role</dt><dd>Founder</dd>
+          <dt>Stage</dt><dd>Pre-seed</dd>
+        </dl>
+        <h2 class="snug-name">Snug<span class="beacon">.</span></h2>
+        <p class="snug-tagline">The first dating app with a feedback loop.</p>
+        <div class="snug-callout">
+          <div class="snug-callout-figure">15<span class="x">×</span></div>
+          <div class="snug-callout-caption">second-date rate vs. major dating apps.</div>
+        </div>
+        <div class="snug-body">
+          <p>Dating products optimize for swipes; we optimize for second dates. Every match generates a small loop of post-date feedback the matching engine — and you — actually learn from. We're seeing a 15× second-date rate compared to major dating apps.</p>
+          <p>Launched in two cities — Denver and New York. We're a team of five learning what kind of feedback people are willing to give about a near-stranger, and how fast that signal compounds.</p>
+        </div>
+        <div class="snug-ctas">
+          <a href="https://www.joinsnug.com" target="_blank" rel="noopener" class="btn primary">Visit Snug →</a>
+          <a href="#" class="text-link" id="investorRequestOpen">Request investor info →</a>
+        </div>
+      </div>
+
+      <div class="snug-right">
+        <div class="peak-frame" aria-hidden="true">
+          <div class="peak-corner tl">// CURRENT POSITION</div>
+          <svg viewBox="0 0 500 400" preserveAspectRatio="xMidYMid meet">
+            <g id="peakContours"></g>
+            <!-- summit marker: pole + flag + glow dot -->
+            <line class="peak-flagpole" x1="270" y1="120" x2="270" y2="74"></line>
+            <polygon class="peak-flag" points="270,76 296,84 270,94"></polygon>
+            <circle class="peak-summit-dot" cx="270" cy="120" r="3.5"></circle>
+          </svg>
+        </div>
+        <dl class="snug-stats">
+          <div class="row"><span class="k">Team size</span><span class="v">5</span></div>
+          <div class="row"><span class="k">Cities live</span><span class="v">Denver · NYC</span></div>
+          <div class="row"><span class="k">Launched</span><span class="v">May 2026</span></div>
+          <div class="row"><span class="k">Round</span><span class="v accent">Open · Summer 2026</span></div>
+        </dl>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 05 Trail reports -->
+<section id="s5" data-section="5">
+  <div class="wrap">
+    <div class="eyebrow">05 — TRAIL REPORTS</div>
+    <h2 class="section-title">From people who've <em>climbed</em> with me.</h2>
+    <div class="reports">
+      <div class="report">
+        <div class="report-meta">
+          <div>RPT 001</div>
+          <div>Mar 14, 2024</div>
+          <div>Conditions: <span class="cond-word">clear</span></div>
+        </div>
+        <div>
+          <div class="report-header">"He found the product before we did."</div>
+          <p class="report-body">Chase joined when our hypothesis was three people in a Notion doc. Within a quarter he'd run six prototypes past real users and killed the four that didn't matter. We shipped the right thing the first time, which almost never happens.</p>
+          <div class="report-attr">— S. PATEL · CO-FOUNDER, NORTHWIND</div>
+        </div>
+      </div>
+      <div class="report">
+        <div class="report-meta">
+          <div>RPT 002</div>
+          <div>Sep 02, 2023</div>
+          <div>Conditions: <span class="cond-word">stormy</span></div>
+        </div>
+        <div>
+          <div class="report-header">"Calm in the messy middle."</div>
+          <p class="report-body">We hit a wall at month four and the team was fracturing. Chase came in two days a week, rebuilt our weekly cadence, and made the hard calls about what to cut. It felt less like a consultant and more like a co-founder who would leave on time.</p>
+          <div class="report-attr">— J. OKAFOR · FOUNDER, BASIN</div>
+        </div>
+      </div>
+      <div class="report">
+        <div class="report-meta">
+          <div>RPT 003</div>
+          <div>Nov 21, 2022</div>
+          <div>Conditions: <span class="cond-word">bluebird</span></div>
+        </div>
+        <div>
+          <div class="report-header">"He'll tell you what your investors won't."</div>
+          <p class="report-body">Honest, fast, and never precious about his own ideas. The first time he told me to scrap a feature I loved, I knew I'd hire him for everything after.</p>
+          <div class="report-attr">— M. ALVAREZ · GP, SEED&amp;SUMMIT</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 06 CTA -->
+<section class="cta" id="s6" data-section="6">
+  <div class="wrap">
+    <div class="cta-grid">
+      <div class="cta-left">
+        <div class="eyebrow">06 — NEXT PITCH</div>
+        <h2 class="cta-headline">Got a <em class="nbsp-lock">0&#8209;to&#8209;1</em> <span class="nbsp-lock">idea?</span></h2>
+        <p class="cta-sub">Let's plan the route.</p>
+      </div>
+      <div class="cta-right" aria-hidden="false">
+        <a href="mailto:chaseccroft@gmail.com?subject=Let%27s%20plan%20the%20route&body=Hi%20Chase%2C%0A%0AI%20came%20across%20your%20site%20and%20I%27d%20love%20to%20talk%20about%20working%20together.%20Here%27s%20what%20I%27m%20working%20on%3A%0A%0A%5B%20a%20few%20sentences%20about%20the%20idea%20%5D%0A%0AWhen%20are%20you%20free%20for%20a%20call%20in%20the%20next%20week%20or%20two%3F%0A%0AThanks%2C%0A%5B%20your%20name%20%5D" target="_blank" rel="noopener" class="btn primary mobile-cta">Start a conversation →</a>
+      </div>
+    </div>
+  </div>
+  <!-- Fixed summit cluster: pin lands on topo bullseye, button radiates from it -->
+  <div class="summit-cluster" id="summitCluster" aria-hidden="true">
+    <div class="summit-pin" id="summitPin">06</div>
+    <div class="summit-label" id="summitLabel">SUMMIT</div>
+    <a href="mailto:chaseccroft@gmail.com?subject=Let%27s%20plan%20the%20route&body=Hi%20Chase%2C%0A%0AI%20came%20across%20your%20site%20and%20I%27d%20love%20to%20talk%20about%20working%20together.%20Here%27s%20what%20I%27m%20working%20on%3A%0A%0A%5B%20a%20few%20sentences%20about%20the%20idea%20%5D%0A%0AWhen%20are%20you%20free%20for%20a%20call%20in%20the%20next%20week%20or%20two%3F%0A%0AThanks%2C%0A%5B%20your%20name%20%5D" target="_blank" rel="noopener" class="btn primary summit-cta">Start a conversation →</a>
+  </div>
+</section>
+
+<!-- Investor info modal -->
+<div class="modal-backdrop" id="investorModal" role="dialog" aria-modal="true" aria-labelledby="investorModalTitle" hidden>
+  <div class="modal-panel" role="document">
+    <div class="modal-eyebrow">// REQUEST INVESTOR INFO</div>
+    <h3 class="modal-title" id="investorModalTitle">Get the deck.</h3>
+    <p class="modal-sub">Tell me a bit about you and I'll send investor materials directly.</p>
+    <form class="modal-form" id="investorForm" novalidate>
+      <div class="modal-field">
+        <label for="iName">Name</label>
+        <input id="iName" name="name" type="text" autocomplete="name" required />
+      </div>
+      <div class="modal-field">
+        <label for="iCompany">Company</label>
+        <input id="iCompany" name="company" type="text" autocomplete="organization" />
+      </div>
+      <div class="modal-field">
+        <label for="iEmail">Email</label>
+        <input id="iEmail" name="email" type="email" autocomplete="email" required />
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="modal-back" id="investorBack">← Back</button>
+        <button type="submit" class="btn primary">Send →</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast" role="status" aria-live="polite">Sent — I'll be in touch.</div>
+
+<!-- elevations decode to coords. happy hunting. -->
+</div><!-- /#homeRoot -->
+
+<!-- Case study (Trip Report) view — populated by JS on click -->
+<div id="caseRoot" aria-hidden="true"></div>
+
+<footer>
+  <div class="footer-inner">
+    <div>© 2026 Chase Croft</div>
+    <div>// built in Denver</div>
+    <div class="footer-links">
+      <a href="#">Snug</a>
+      <a href="#">LinkedIn</a>
+      <a href="#">Twitter</a>
+    </div>
+    <a href="404.html" class="footer-offtrail">// off-trail</a>
+  </div>
+</footer>
+
+<script>
+// gg
+(() => {
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  gsap.registerPlugin(ScrollTrigger);
+
+  const isMobile = window.innerWidth < 720;
+  const VW = 1600, VH = 1000;
+
+  // ---------- Build contour paths ----------
+  const contoursG = document.getElementById('contours');
+  const COUNT = isMobile ? 10 : 18;
+  // peak roughly upper-right
+  const cx = 1200, cy = 300;
+
+  // deterministic pseudo-random
+  let seed = 7;
+  const rand = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
+
+  // Shared angular noise profile — every contour same shape, scaled.
+  // Guarantees nested non-intersecting loops.
+  const POINTS = 32;
+  const ANGLES = [];
+  const NOISE = [];
+  for (let i = 0; i < POINTS; i++) {
+    const a = (i / POINTS) * Math.PI * 2;
+    ANGLES.push(a);
+    const n = 1
+      + 0.16 * Math.sin(a * 2 + 1.1)
+      + 0.10 * Math.sin(a * 3 - 0.4)
+      + 0.06 * Math.cos(a * 5 + 0.7)
+      + 0.04 * Math.sin(a * 7 + 2.3);
+    NOISE.push(n);
+  }
+
+  // Variable spacing: bunch tightly in zones 3 (steep climb) and 5 (final pitch),
+  // spread out in zones 1 (valley) and 4 (saddle). The map level -> radius is
+  // monotonic & piecewise so loops never cross.
+  // Density profile across normalized level [0=outer .. 1=summit]:
+  //   0.00–0.20  zone 1 (valley)        — wide
+  //   0.20–0.40  zone 2 (traverse)      — medium
+  //   0.40–0.62  zone 3 (switchbacks)   — tight
+  //   0.62–0.80  zone 4 (saddle)        — wide
+  //   0.80–1.00  zone 5 (final pitch)   — tightest
+  function radiusForLevel(level) {
+    const t = level / (COUNT - 1); // 0..1, 0 outer
+    // densityWeight = how much radius each "step" consumes; smaller = tighter spacing
+    function w(u) {
+      if (u < 0.20) return 1.6;          // valley wide
+      if (u < 0.40) return 1.0;          // traverse medium
+      if (u < 0.62) return 0.45;         // switchbacks tight
+      if (u < 0.80) return 1.4;          // saddle wide
+      return 0.30;                       // final pitch tightest
+    }
+    // integrate weight over [t..1] then map to radius range
+    const STEPS = 200;
+    const dt = (1 - t) / STEPS;
+    let acc = 0;
+    for (let i = 0; i < STEPS; i++) acc += w(t + i * dt) * dt;
+    // total integral 0..1
+    let total = 0;
+    const dt2 = 1 / STEPS;
+    for (let i = 0; i < STEPS; i++) total += w(i * dt2) * dt2;
+    const innerR = 50;
+    const outerR = 920;
+    return innerR + (outerR - innerR) * (acc / total);
+  }
+
+  function makeContour(level) {
+    const r = radiusForLevel(level);
+    const pts = [];
+    for (let i = 0; i < POINTS; i++) {
+      const a = ANGLES[i];
+      const rx = r * NOISE[i];
+      const ry = r * NOISE[i] * 0.78;
+      pts.push([cx + Math.cos(a) * rx, cy + Math.sin(a) * ry]);
+    }
+    let d = `M ${pts[0][0].toFixed(1)} ${pts[0][1].toFixed(1)}`;
+    for (let i = 0; i < pts.length; i++) {
+      const p0 = pts[(i - 1 + pts.length) % pts.length];
+      const p1 = pts[i];
+      const p2 = pts[(i + 1) % pts.length];
+      const p3 = pts[(i + 2) % pts.length];
+      const c1x = p1[0] + (p2[0] - p0[0]) / 6;
+      const c1y = p1[1] + (p2[1] - p0[1]) / 6;
+      const c2x = p2[0] - (p3[0] - p1[0]) / 6;
+      const c2y = p2[1] - (p3[1] - p1[1]) / 6;
+      d += ` C ${c1x.toFixed(1)} ${c1y.toFixed(1)}, ${c2x.toFixed(1)} ${c2y.toFixed(1)}, ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`;
+    }
+    d += ' Z';
+    return d;
+  }
+
+  const contourPaths = [];
+  for (let i = 0; i < COUNT; i++) {
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', makeContour(i));
+    path.setAttribute('class', 'contour');
+    const isIndex = (i % 4 === 0);
+    const base = 0.7;
+    const thickness = isIndex ? base * 1.5 : base;
+    path.setAttribute('stroke-width', thickness.toFixed(2));
+    if (isIndex) path.setAttribute('stroke-opacity', '1.4');
+    contoursG.appendChild(path);
+    const len = path.getTotalLength();
+    path.style.strokeDasharray = len;
+    path.style.strokeDashoffset = reduced ? 0 : len;
+    contourPaths.push({ el: path, len });
+  }
+
+  // ---------- Trail path ----------
+  // Pins land at meaningful terrain transitions:
+  //   00 trailhead (valley floor)
+  //   01 end of valley approach / start of traverse
+  //   02 base of switchbacks
+  //   03 top of switchbacks (start of ridge)
+  //   04 end of ridge (start of final pitch)
+  //   05 high camp (start of summit push)
+  //   06 summit
+  const waypoints = [
+    { x: 110,  y: 940, n: '00', label: 'TRAILHEAD' },
+    { x: 360,  y: 870, n: '01', label: 'GUIDE' },
+    { x: 560,  y: 760, n: '02', label: 'KIT' },
+    { x: 720,  y: 580, n: '03', label: 'TRIPS' },
+    { x: 1020, y: 520, n: '04', label: 'NOW' },
+    { x: 1140, y: 410, n: '05', label: 'REPORTS' },
+    { x: 1185, y: 250, n: '06', label: 'SUMMIT' }
+  ];
+
+  // Hand-built segments per zone. Each pushes intermediate anchor points.
+  // sharp = use straight L lines (switchbacks); curve = use C bezier.
+  function jit(amt) { return (rand() - 0.5) * amt; } // tiny hand-drawn wobble
+  const segs = [];
+
+  // ZONE 1 (00 -> 01): gentle valley curve, mostly horizontal slow rise
+  segs.push({ kind: 'curve', from: 0, to: 1, sway: -40, lift: 30, wobble: 3 });
+
+  // ZONE 2 (01 -> 02): diagonal traverse, shallow angle, slight curve
+  segs.push({ kind: 'curve', from: 1, to: 2, sway: -25, lift: -10, wobble: 4 });
+
+  // ZONE 3 (02 -> 03): switchbacks — three sharp corners between
+  // We insert 3 intermediate points forming a Z pattern up the slope
+  segs.push({
+    kind: 'switchback',
+    from: 2, to: 3,
+    points: [
+      { x: 700, y: 720 }, // hard right
+      { x: 580, y: 680 }, // hard left
+      { x: 760, y: 640 }, // hard right
+      { x: 620, y: 600 }  // hard left into 03
+    ]
+  });
+
+  // ZONE 4 (03 -> 04): nearly horizontal ridge traverse, long stretch
+  segs.push({ kind: 'curve', from: 3, to: 4, sway: 0, lift: -20, wobble: 5 });
+
+  // ZONE 5 (04 -> 05 -> 06): final pitch, steeper, one small switchback before summit
+  segs.push({
+    kind: 'switchback',
+    from: 4, to: 5,
+    points: [
+      { x: 1080, y: 480 }, // small jog right
+      { x: 1060, y: 440 }  // back left
+    ]
+  });
+  segs.push({ kind: 'curve', from: 5, to: 6, sway: -4, lift: 0, wobble: 1.5 });
+
+  function buildTrail() {
+    let d = `M ${waypoints[0].x} ${waypoints[0].y}`;
+    segs.forEach(seg => {
+      const a = waypoints[seg.from];
+      const b = waypoints[seg.to];
+      if (seg.kind === 'curve') {
+        const midX = (a.x + b.x) / 2 + (seg.sway || 0);
+        const midY = (a.y + b.y) / 2 + (seg.lift || 0);
+        const c1x = a.x + (midX - a.x) * 0.6 + jit(seg.wobble);
+        const c1y = a.y + (midY - a.y) * 0.6 + jit(seg.wobble);
+        const c2x = b.x + (midX - b.x) * 0.6 + jit(seg.wobble);
+        const c2y = b.y + (midY - b.y) * 0.6 + jit(seg.wobble);
+        d += ` C ${c1x.toFixed(1)} ${c1y.toFixed(1)}, ${c2x.toFixed(1)} ${c2y.toFixed(1)}, ${b.x} ${b.y}`;
+      } else if (seg.kind === 'switchback') {
+        // sharp angled corners — short curve into corner, straight out
+        seg.points.forEach(p => {
+          d += ` L ${(p.x + jit(2)).toFixed(1)} ${(p.y + jit(2)).toFixed(1)}`;
+        });
+        d += ` L ${b.x} ${b.y}`;
+      }
+    });
+    return d;
+  }
+  const td = buildTrail();
+  const trailEl = document.getElementById('trail');
+  trailEl.setAttribute('d', td);
+  // sharp corners on switchback section
+  trailEl.setAttribute('stroke-linejoin', 'miter');
+  trailEl.setAttribute('stroke-linecap', 'round');
+  const trailLen = trailEl.getTotalLength();
+  trailEl.style.strokeDasharray = trailLen;
+  trailEl.style.strokeDashoffset = reduced ? 0 : trailLen;
+
+  // ---------- Pins ----------
+  // Pin 06 (summit) is rendered as HTML inside the CTA section, not as SVG.
+  const pinsG = document.getElementById('pins');
+  const pinEls = [];
+  waypoints.forEach((w, i) => {
+    if (i === waypoints.length - 1) { pinEls.push(null); return; }
+    const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    g.setAttribute('class', 'pin-group');
+    g.setAttribute('transform', `translate(${w.x},${w.y})`);
+    const r = 16;
+    g.innerHTML = `
+      <circle class="pin-circle" r="${r}"></circle>
+      <text class="pin-num" y="0">${w.n}</text>
+      <text class="pin-label" y="${r + 14}">${w.label}</text>
+    `;
+    pinsG.appendChild(g);
+    pinEls.push(g);
+  });
+
+  if (reduced) {
+    pinEls.forEach(p => { if (p) p.style.opacity = 1; });
+    document.getElementById('summitPin').style.opacity = 1;
+    document.getElementById('summitPin').style.transform = 'scale(1)';
+    document.getElementById('summitLabel').classList.add('in');
+  }
+
+  // ---------- Hero entrance ----------
+  function splitText(el, text) {
+    el.innerHTML = '';
+    text.split(' ').forEach((word, wi, arr) => {
+      const wordSpan = document.createElement('span');
+      wordSpan.className = 'word';
+      [...word].forEach(ch => {
+        const mask = document.createElement('span');
+        mask.className = 'char-mask';
+        const c = document.createElement('span');
+        c.className = 'char';
+        c.textContent = ch;
+        mask.appendChild(c);
+        wordSpan.appendChild(mask);
+      });
+      el.appendChild(wordSpan);
+      if (wi < arr.length - 1) el.appendChild(document.createTextNode(' '));
+    });
+  }
+  const headline = document.getElementById('heroHeadline');
+  const subhead = document.getElementById('heroSubhead');
+  splitText(headline, 'From trailhead.');
+  splitText(subhead, 'to summit.');
+
+  if (!reduced) {
+    const heroChars = headline.querySelectorAll('.char');
+    const subChars = subhead.querySelectorAll('.char');
+    gsap.set(heroChars, { yPercent: 110 });
+    gsap.set(subChars, { yPercent: 110 });
+    const tl = gsap.timeline({ delay: 0.2 });
+    tl.to(heroChars, {
+      yPercent: 0,
+      duration: 0.9,
+      ease: 'power3.out',
+      stagger: 0.04
+    });
+    tl.to(subChars, {
+      yPercent: 0,
+      duration: 0.9,
+      ease: 'power3.out',
+      stagger: 0.04
+    }, '>');
+    tl.to('#heroPitch', { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' }, '+=0.4');
+    tl.to('#heroCreds', { opacity: 1, duration: 0.6 }, '-=0.3');
+
+    // first 4 outermost contours begin drawing
+    const initialReveal = Math.min(4, contourPaths.length);
+    for (let i = 0; i < initialReveal; i++) {
+      gsap.to(contourPaths[i].el, {
+        strokeDashoffset: 0,
+        duration: 1.6 + i * 0.15,
+        ease: 'power2.out',
+        delay: 0.2 + i * 0.12
+      });
+    }
+    // pin 00 drops
+    gsap.fromTo(pinEls[0],
+      { opacity: 0, scale: 0, transformOrigin: 'center' },
+      { opacity: 1, scale: 1, duration: 0.5, ease: 'back.out(2)', delay: 0.6,
+        onStart: () => { pinEls[0].style.transformOrigin = `${waypoints[0].x}px ${waypoints[0].y}px`; }
+      });
+  } else {
+    document.querySelectorAll('.char').forEach(c => c.style.transform = 'none');
+    document.getElementById('heroSubhead').style.opacity = 1;
+    document.getElementById('heroPitch').style.opacity = 1;
+    document.getElementById('heroCreds').style.opacity = 1;
+  }
+
+  // ---------- Scroll-linked animations ----------
+  if (!reduced) {
+    const docEl = document.documentElement;
+
+    // Contour reveal — outer first, inner last
+    // first contour already drew on load, animate the rest scroll-linked
+    contourPaths.forEach((c, i) => {
+      if (i < 4) return;
+      const startPct = 0.05 + (i / contourPaths.length) * 0.55; // outer earlier
+      const endPct = startPct + 0.18;
+      ScrollTrigger.create({
+        trigger: 'body',
+        start: () => `${startPct * 100}% top`,
+        end: () => `${endPct * 100}% top`,
+        scrub: 1,
+        onUpdate: self => {
+          c.el.style.strokeDashoffset = (1 - self.progress) * c.len;
+        }
+      });
+    });
+
+    // Trail draw — slightly ahead of scroll
+    const leadDot = document.getElementById('leadDot');
+    const summitPinEl = document.getElementById('summitPin');
+    const summitLabelEl = document.getElementById('summitLabel');
+    let summitArrived = false;
+    ScrollTrigger.create({
+      trigger: 'body',
+      start: 'top top',
+      end: 'bottom bottom',
+      scrub: 1,
+      onUpdate: self => {
+        const ahead = Math.min(1, self.progress + 0.05);
+        trailEl.style.strokeDashoffset = (1 - ahead) * trailLen;
+        const tipDist = ahead * trailLen;
+        if (tipDist > 4 && ahead < 0.995) {
+          const pt = trailEl.getPointAtLength(tipDist);
+          leadDot.setAttribute('cx', pt.x);
+          leadDot.setAttribute('cy', pt.y);
+          leadDot.style.opacity = 1;
+        } else if (ahead >= 0.995) {
+          if (!summitArrived) summitArrived = true;
+          leadDot.style.opacity = 0;
+        } else if (ahead < 4) {
+          leadDot.style.opacity = 0;
+        }
+        // If user retreats below the summit threshold, allow the summit pin
+        // to be re-armed so it can re-enter cleanly when scrolling back down.
+        if (ahead < 0.99 && summitArrived) {
+          summitArrived = false;
+        }
+        if (window.__updatePinsForTip) window.__updatePinsForTip(tipDist);
+      }
+    });
+
+    // Summit pin entrance + single pulse — fires once
+    // Position the fixed summit cluster at the topo SVG's summit point on screen.
+    function positionSummitCluster() {
+      const cluster = document.getElementById('summitCluster');
+      const svg = document.querySelector('.topo svg');
+      if (!svg || !cluster) return;
+      const rect = svg.getBoundingClientRect();
+      // viewBox 0 0 1600 1000, preserveAspectRatio xMidYMid slice
+      const vbW = 1600, vbH = 1000;
+      const scale = Math.max(rect.width / vbW, rect.height / vbH);
+      const offsetX = (rect.width - vbW * scale) / 2;
+      const offsetY = (rect.height - vbH * scale) / 2;
+      // summit center in viewBox = (cx, cy) = (1200, 300)
+      const screenX = rect.left + offsetX + 1185 * scale;
+      const screenY = rect.top + offsetY + 250 * scale;
+      cluster.style.left = screenX + 'px';
+      cluster.style.top = screenY + 'px';
+    }
+    positionSummitCluster();
+    window.addEventListener('resize', positionSummitCluster);
+
+    // Visibility: cluster shows when section 06 is in view, hides otherwise.
+    const summitCluster = document.getElementById('summitCluster');
+    ScrollTrigger.create({
+      trigger: '#s6',
+      start: 'top 70%',
+      end: 'bottom top',
+      onEnter: () => summitCluster.classList.add('show'),
+      onEnterBack: () => summitCluster.classList.add('show'),
+      onLeave: () => summitCluster.classList.remove('show'),
+      onLeaveBack: () => summitCluster.classList.remove('show')
+    });
+    // One-time entrance pulse — fires the first time section 06 enters.
+    ScrollTrigger.create({
+      trigger: '#s6',
+      start: 'top 70%',
+      once: true,
+      onEnter: () => {
+        summitLabelEl.classList.add('in');
+        const tl = gsap.timeline();
+        tl.to(summitPinEl, { scale: 1, duration: 0.45, ease: 'back.out(2.2)' });
+        tl.to(summitPinEl, { scale: 1.2, duration: 0.3, ease: 'power2.out' }, '+=0.1');
+        tl.to(summitPinEl, { scale: 1, duration: 0.3, ease: 'power2.inOut' });
+      }
+    });
+
+    // Pin visibility tied directly to the leading-edge dot's tipDist along
+    // the trail. We precompute each pin's distance-along-trail; on every
+    // trail-draw update, pins whose distance ≤ tipDist are visible, the rest
+    // hidden. The bounce entrance only plays the first time a pin appears in
+    // a session — subsequent re-entrances after retreat just fade in fast.
+    const SAMPLES = 600;
+    const pinDistances = new Array(waypoints.length).fill(0);
+    const bestDist = new Array(waypoints.length).fill(Infinity);
+    for (let s = 0; s <= SAMPLES; s++) {
+      const dist = (s / SAMPLES) * trailLen;
+      const pt = trailEl.getPointAtLength(dist);
+      for (let i = 1; i < waypoints.length; i++) {
+        const dx = pt.x - waypoints[i].x;
+        const dy = pt.y - waypoints[i].y;
+        const d = dx*dx + dy*dy;
+        if (d < bestDist[i]) { bestDist[i] = d; pinDistances[i] = dist; }
+      }
+    }
+    // Tracking
+    const pinVisible = new Array(waypoints.length).fill(false);
+    const pinBouncedOnce = new Array(waypoints.length).fill(false);
+    function setPinVisible(i, vis) {
+      const el = pinEls[i];
+      if (!el) return;
+      if (vis && !pinVisible[i]) {
+        pinVisible[i] = true;
+        el.style.transformOrigin = `${waypoints[i].x}px ${waypoints[i].y}px`;
+        if (!pinBouncedOnce[i]) {
+          pinBouncedOnce[i] = true;
+          gsap.fromTo(el,
+            { opacity: 0, scale: 0 },
+            { opacity: 1, scale: 1, duration: 0.5, ease: 'back.out(2.4)', overwrite: true }
+          );
+        } else {
+          gsap.to(el, { opacity: 1, scale: 1, duration: 0.18, ease: 'power2.out', overwrite: true });
+        }
+      } else if (!vis && pinVisible[i]) {
+        pinVisible[i] = false;
+        gsap.to(el, { opacity: 0, scale: 0, duration: 0.2, ease: 'power2.in', overwrite: true });
+      }
+    }
+    // Expose to the trail-draw scrub
+    window.__updatePinsForTip = function (tipDist) {
+      for (let i = 1; i < waypoints.length - 1; i++) {
+        setPinVisible(i, tipDist >= pinDistances[i] - 1);
+      }
+    };
+
+    // Calm sections — fade contours & gentle camera zoom from section 4 onward
+    const topoGroup = document.getElementById('topoGroup');
+    ScrollTrigger.create({
+      trigger: '#s4',
+      start: 'top 60%',
+      end: 'bottom bottom',
+      scrub: 1,
+      onUpdate: self => {
+        const p = self.progress; // 0..1
+        const opa = 1 - 0.4 * p;
+        const scale = 1 + 0.08 * p;
+        contoursG.style.opacity = opa;
+        topoGroup.style.transformOrigin = '67% 38%';
+        topoGroup.style.transform = `scale(${scale})`;
+      }
+    });
+  }
+
+  // ---------- Snug peak SVG (section 04) ----------
+  (function buildPeak() {
+    const g = document.getElementById('peakContours');
+    if (!g) return;
+    // peak summit at (270, 120) — matches flag in HTML
+    const pcx = 270, pcy = 120;
+    const PCOUNT = 9;
+    const PPOINTS = 28;
+    // shared per-contour noise — different from page topo so it reads as its own peak
+    const PANG = [], PNOI = [];
+    let s = 17;
+    const r = () => { s = (s * 9301 + 49297) % 233280; return s / 233280; };
+    for (let i = 0; i < PPOINTS; i++) {
+      const a = (i / PPOINTS) * Math.PI * 2;
+      PANG.push(a);
+      const n = 1
+        + 0.18 * Math.sin(a * 2 + 0.6)
+        + 0.11 * Math.sin(a * 3 + 1.8)
+        + 0.07 * Math.cos(a * 4 - 0.3)
+        + 0.04 * Math.sin(a * 6 + 1.1);
+      PNOI.push(n);
+    }
+    function pradius(level) {
+      // tighter spacing near the summit, wider at the base
+      const t = level / (PCOUNT - 1); // 0 outer .. 1 inner
+      function w(u) {
+        if (u < 0.30) return 1.4;   // base
+        if (u < 0.65) return 0.8;   // mid slope
+        return 0.35;                // summit cone — tight rings
+      }
+      const STEPS = 120;
+      const dt = (1 - t) / STEPS;
+      let acc = 0;
+      for (let i = 0; i < STEPS; i++) acc += w(t + i * dt) * dt;
+      let total = 0;
+      const dt2 = 1 / STEPS;
+      for (let i = 0; i < STEPS; i++) total += w(i * dt2) * dt2;
+      const innerR = 14;
+      const outerR = 220;
+      return innerR + (outerR - innerR) * (acc / total);
+    }
+    for (let i = 0; i < PCOUNT; i++) {
+      const rad = pradius(i);
+      const pts = [];
+      for (let j = 0; j < PPOINTS; j++) {
+        const a = PANG[j];
+        const rx = rad * PNOI[j];
+        // squashed vertically — gives "peak rising from below" feel
+        const ry = rad * PNOI[j] * 0.62;
+        // shift the center up slightly per ring so the peak leans skyward
+        const ringShiftY = -i * 1.2;
+        pts.push([pcx + Math.cos(a) * rx, pcy + ringShiftY + Math.sin(a) * ry]);
+      }
+      let d = `M ${pts[0][0].toFixed(1)} ${pts[0][1].toFixed(1)}`;
+      for (let j = 0; j < pts.length; j++) {
+        const p0 = pts[(j - 1 + pts.length) % pts.length];
+        const p1 = pts[j];
+        const p2 = pts[(j + 1) % pts.length];
+        const p3 = pts[(j + 2) % pts.length];
+        const c1x = p1[0] + (p2[0] - p0[0]) / 6;
+        const c1y = p1[1] + (p2[1] - p0[1]) / 6;
+        const c2x = p2[0] - (p3[0] - p1[0]) / 6;
+        const c2y = p2[1] - (p3[1] - p1[1]) / 6;
+        d += ` C ${c1x.toFixed(1)} ${c1y.toFixed(1)}, ${c2x.toFixed(1)} ${c2y.toFixed(1)}, ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`;
+      }
+      d += ' Z';
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', d);
+      path.setAttribute('class', 'peak-contour' + (i % 3 === 0 ? ' index' : ''));
+      g.appendChild(path);
+    }
+  })();
+
+  // ---------- Section 04 — intensify page topo + summit dot pulse ----------
+  if (!reduced) {
+    const contoursG2 = document.getElementById('contours');
+    const leadDotEl = document.getElementById('leadDot');
+    let pulsedAtPin4 = false;
+    ScrollTrigger.create({
+      trigger: '#s4',
+      start: 'top 75%',
+      end: 'bottom 25%',
+      onEnter: () => {
+        gsap.to(contoursG2, { '--contour-mul': 1, opacity: 1, duration: 0.6, ease: 'power2.out' });
+        contoursG2.style.filter = 'brightness(1.35) contrast(1.05)';
+        if (!pulsedAtPin4 && leadDotEl) {
+          pulsedAtPin4 = true;
+          gsap.fromTo(leadDotEl,
+            { scale: 1, transformOrigin: 'center' },
+            { scale: 2.6, duration: 0.35, ease: 'power2.out', yoyo: true, repeat: 1, transformOrigin: 'center' }
+          );
+        }
+      },
+      onLeave: () => { contoursG2.style.filter = ''; },
+      onEnterBack: () => { contoursG2.style.filter = 'brightness(1.35) contrast(1.05)'; },
+      onLeaveBack: () => { contoursG2.style.filter = ''; }
+    });
+  }
+
+  // ---------- Trips Logged: data-driven render + pagination ----------
+  (function tripsRender() {
+    const grid = document.getElementById('tripsGrid');
+    const dataEl = document.getElementById('trips-data');
+    const nav = document.getElementById('tripsNav');
+    const prevBtn = document.getElementById('tripsPrev');
+    const nextBtn = document.getElementById('tripsNext');
+    if (!grid || !dataEl) return;
+
+    let trips = [];
+    try { trips = JSON.parse(dataEl.textContent); } catch (e) { return; }
+    const PAGE_SIZE = 4;
+    let page = 0;
+    const totalPages = Math.ceil(trips.length / PAGE_SIZE);
+
+    // Tiny topo sketch generator — 4 nested noisy contours forming a small peak
+    // viewBox 100x80, peak roughly upper-right inside the chip
+    function makeMiniTopo(seedBase) {
+      let s = seedBase * 31 + 7;
+      const r = () => { s = (s * 9301 + 49297) % 233280; return s / 233280; };
+      const PTS = 20;
+      const angles = [], noise = [];
+      for (let i = 0; i < PTS; i++) {
+        const a = (i / PTS) * Math.PI * 2;
+        angles.push(a);
+        noise.push(1 + 0.18 * Math.sin(a * 2 + r() * 1.5) + 0.10 * Math.sin(a * 3 + r() * 2.0) + 0.06 * Math.cos(a * 5 + r()));
+      }
+      const cx = 64, cy = 48;
+      const rings = 4;
+      const rmax = 36, rmin = 6;
+      const paths = [];
+      for (let k = 0; k < rings; k++) {
+        const t = k / (rings - 1);
+        const rad = rmin + (rmax - rmin) * (1 - t);
+        const pts = [];
+        for (let i = 0; i < PTS; i++) {
+          const a = angles[i];
+          const rx = rad * noise[i];
+          const ry = rad * noise[i] * 0.7;
+          pts.push([cx + Math.cos(a) * rx, cy + Math.sin(a) * ry - k * 1.5]);
+        }
+        let d = `M ${pts[0][0].toFixed(1)} ${pts[0][1].toFixed(1)}`;
+        for (let i = 0; i < pts.length; i++) {
+          const p0 = pts[(i - 1 + pts.length) % pts.length];
+          const p1 = pts[i];
+          const p2 = pts[(i + 1) % pts.length];
+          const p3 = pts[(i + 2) % pts.length];
+          const c1x = p1[0] + (p2[0] - p0[0]) / 6;
+          const c1y = p1[1] + (p2[1] - p0[1]) / 6;
+          const c2x = p2[0] - (p3[0] - p1[0]) / 6;
+          const c2y = p2[1] - (p3[1] - p1[1]) / 6;
+          d += ` C ${c1x.toFixed(1)} ${c1y.toFixed(1)}, ${c2x.toFixed(1)} ${c2y.toFixed(1)}, ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`;
+        }
+        d += ' Z';
+        paths.push(`<path d="${d}"></path>`);
+      }
+      return `<svg viewBox="0 0 128 80" preserveAspectRatio="xMidYMid meet">${paths.join('')}</svg>`;
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+    }
+
+    function renderPage(p) {
+      const start = p * PAGE_SIZE;
+      const slice = trips.slice(start, start + PAGE_SIZE);
+      grid.innerHTML = slice.map((t, i) => {
+        const idx = start + i;
+        return `
+        <article class="trip">
+          <div class="trip-topo" aria-hidden="true">${makeMiniTopo(idx + 1)}</div>
+          <div class="trip-elev">${escapeHtml(t.metric)}</div>
+          <div>
+            <div class="trip-tag">${escapeHtml(t.tag)}</div>
+            <h3 class="trip-name">${escapeHtml(t.name)}</h3>
+            <div class="trip-role">${escapeHtml(t.role)}</div>
+          </div>
+          <div>
+            <p class="trip-outcome">${escapeHtml(t.outcome)}<span class="kicker">${escapeHtml(t.kicker)}</span></p>
+            <a href="#" class="trip-link" data-trip-index="${idx}">Trip report →</a>
+          </div>
+        </article>
+      `;}).join('');
+    }
+
+    function updateNav() {
+      const ind = document.getElementById('tripsPageInd');
+      if (totalPages <= 1) {
+        nav.style.display = 'none';
+        return;
+      }
+      nav.style.display = 'flex';
+      prevBtn.classList.toggle('dim', page === 0);
+      nextBtn.classList.toggle('dim', page === totalPages - 1);
+      if (ind) {
+        const pad = (n) => String(n).padStart(2, '0');
+        ind.textContent = `${pad(page + 1)} / ${pad(totalPages)}`;
+      }
+    }
+
+    function goTo(newPage) {
+      if (newPage < 0 || newPage >= totalPages || newPage === page) return;
+      grid.classList.add('fading');
+      setTimeout(() => {
+        page = newPage;
+        renderPage(page);
+        updateNav();
+        // refresh-paint then remove fading
+        requestAnimationFrame(() => grid.classList.remove('fading'));
+      }, 280);
+    }
+
+    prevBtn.addEventListener('click', () => goTo(page - 1));
+    nextBtn.addEventListener('click', () => goTo(page + 1));
+
+    renderPage(0);
+    updateNav();
+  })();
+
+  // ---------- Investor info modal ----------
+  (function investorModal() {
+    const openBtn = document.getElementById('investorRequestOpen');
+    const modal = document.getElementById('investorModal');
+    const back = document.getElementById('investorBack');
+    const form = document.getElementById('investorForm');
+    const toast = document.getElementById('toast');
+    if (!openBtn || !modal || !form || !toast) return;
+
+    let lastFocus = null;
+    let toastTimer = null;
+
+    function open(e) {
+      if (e) e.preventDefault();
+      lastFocus = document.activeElement;
+      modal.hidden = false;
+      // next frame so the open class triggers transition
+      requestAnimationFrame(() => modal.classList.add('open'));
+      const first = modal.querySelector('input');
+      if (first) setTimeout(() => first.focus(), 220);
+    }
+    function close() {
+      modal.classList.remove('open');
+      setTimeout(() => {
+        modal.hidden = true;
+        if (lastFocus && lastFocus.focus) lastFocus.focus();
+      }, 220);
+    }
+    function showToast() {
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 4000);
+    }
+
+    openBtn.addEventListener('click', open);
+    back.addEventListener('click', close);
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) close();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !modal.hidden) close();
+    });
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const data = {
+        name: form.name.value.trim(),
+        company: form.company.value.trim(),
+        email: form.email.value.trim()
+      };
+      // Stub — real wiring lands in production codebase (target: chase@joinsnug.com)
+      try {
+        fetch('/api/investor-request', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        }).catch(() => {});
+      } catch (_) {}
+      console.log('[investor-request]', data);
+      form.reset();
+      close();
+      // toast appears just after modal close so it's not hidden behind backdrop
+      setTimeout(showToast, 240);
+    });
+  })();
+
+  // ---------- Trip Report (case-study) routing ----------
+  (function caseRouter() {
+    const homeRoot = document.getElementById('homeRoot');
+    const caseRoot = document.getElementById('caseRoot');
+    const dataEl = document.getElementById('trips-data');
+    if (!homeRoot || !caseRoot || !dataEl) return;
+    let trips = [];
+    try { trips = JSON.parse(dataEl.textContent); } catch (e) { return; }
+
+    function esc(s) {
+      return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+    }
+    function pad3(n) { return String(n).padStart(3, '0'); }
+
+    // Lantern (index 0) gets bespoke copy. Others reuse the template with a placeholder note.
+    function caseContent(t, idx) {
+      const isLantern = idx === 0;
+      const reportNum = pad3(idx + 1);
+
+      const heroTagline = isLantern
+        ? "Consumer journaling app for people figuring out what they're feeling."
+        : t.outcome;
+
+      const heroMeta = isLantern ? [
+        ['Role', 'Founder'],
+        ['Dates', '2018–2021'],
+        ['Team size', '4'],
+        ['Outcome', 'Acquired by wellness platform']
+      ] : [
+        ['Role', t.role.split('·')[0].trim()],
+        ['Dates', (t.role.split('·').slice(-1)[0] || '').trim()],
+        ['Team size', '—'],
+        ['Outcome', t.kicker]
+      ];
+
+      const heroMetric = isLantern ? '50K MAU IN 9 MONTHS' : t.metric;
+
+      const placeholderBanner = isLantern ? '' : `<span class="placeholder-note">// Placeholder — full trip report forthcoming</span>`;
+
+      const heroFigure = isLantern
+        ? `<figure class="case-figure hero">
+             <div class="case-img">[ HERO IMAGE — REPLACE WITH PRODUCT SCREENSHOT ]</div>
+             <figcaption class="case-cap">Lantern's home view, six months after launch.</figcaption>
+           </figure>`
+        : `<figure class="case-figure hero">
+             <div class="case-img">[ HERO IMAGE — ${esc(t.name).toUpperCase()} — REPLACE WITH PRODUCT SCREENSHOT ]</div>
+             <figcaption class="case-cap">Hero image forthcoming.</figcaption>
+           </figure>`;
+
+      const inlineApproachFigure = isLantern
+        ? `<figure class="case-figure inline">
+             <div class="case-img">[ INLINE IMAGE — APPROACH ARTIFACT ]</div>
+             <figcaption class="case-cap">Onboarding flow A/B test, week 3.</figcaption>
+           </figure>`
+        : '';
+
+      const sections = isLantern ? `
+        <section class="case-section">
+          <div class="case-eyebrow">// 01 — THE PROBLEM</div>
+          <h3>What we noticed.</h3>
+          <div class="case-prose">
+            <p>Journaling apps in 2018 were either too clinical (Day One) or too gamified (Stoic). The middle was empty — people who wanted reflection without homework had nowhere to go. Most prospects we talked to had downloaded three apps and abandoned all of them inside a week.</p>
+            <p>The pattern was consistent: people opened the app, faced a blank page or a forced prompt, felt friction, and never came back. The product was failing at the threshold, not at the depth. We didn't need a better journaling experience — we needed a better doorway.</p>
+          </div>
+        </section>
+        <section class="case-section">
+          <div class="case-eyebrow">// 02 — THE APPROACH</div>
+          <h3>What we built.</h3>
+          <div class="case-prose">
+            <p>Two-week cycles, real users every cycle. We shipped a v0 with three opinionated entry points — a daily check-in, a weekly review, and a "something happened" capture — and killed every other entry surface. Cut the prompt library from 200 to 12. Removed all gamification. The first ten users told us what to keep.</p>
+            <span class="case-callout">First 100 users in 14 days — all from a single founder post.</span>
+            <p>By month three, the daily check-in had become the wedge: short enough to do half-asleep, structured enough to feel like progress. Everything else followed from defending that one habit.</p>
+          </div>
+          ${inlineApproachFigure}
+        </section>
+        <section class="case-section">
+          <div class="case-eyebrow">// 03 — THE OUTCOME</div>
+          <h3>What it became.</h3>
+          <div class="case-prose">
+            <p>Nine months in we crossed 50,000 monthly active users on a single founder-led acquisition motion. Retention curves flattened in ways that don't usually happen for consumer wellness apps. By year three, a wellness platform acquired the company and folded the team into their flagship.</p>
+          </div>
+          <div class="case-stats">
+            <div class="case-stat"><span class="label">Time to scale</span><span class="num">9 mo</span></div>
+            <div class="case-stat"><span class="label">Peak MAU</span><span class="num">50K</span></div>
+            <div class="case-stat"><span class="label">NPS</span><span class="num">3.2</span></div>
+            <div class="case-stat"><span class="label">Team</span><span class="num">5</span></div>
+          </div>
+        </section>
+        <section class="case-section">
+          <div class="case-eyebrow">// 04 — THE TAKEAWAY</div>
+          <h3>What I'd carry forward.</h3>
+          <div class="case-prose">
+            <p>The wedge wasn't the journaling. It was a daily check-in that respected your time and didn't pretend to be more than it was. Users showed up because the doorway was honest about its size. We spent the first quarter trying to be a "journaling product" and the rest of the year being a check-in habit that grew into one.</p>
+            <p class="case-kicker">The wedge was the brand. Everything downstream of that was execution.</p>
+          </div>
+        </section>
+      ` : `
+        <section class="case-section">
+          <div class="case-eyebrow">// 01 — THE PROBLEM</div>
+          <h3>What we noticed.</h3>
+          <div class="case-prose">
+            ${placeholderBanner}
+            <p>This trip report is in draft. The short version is captured on the homepage card. The longer write-up — what we noticed in the market, what was broken about the existing solutions, why this team was the right team to attempt it — is forthcoming.</p>
+            <p>If you'd like the full debrief sooner, ping me from the homepage and I'll send notes.</p>
+          </div>
+        </section>
+        <section class="case-section">
+          <div class="case-eyebrow">// 02 — THE APPROACH</div>
+          <h3>What we built.</h3>
+          <div class="case-prose">
+            <p>Cycles, what shipped, what got cut. The mechanics that made this work and the calls that mattered most.</p>
+            <span class="case-callout">${esc(t.metric)} — ${esc(t.kicker)}</span>
+          </div>
+        </section>
+        <section class="case-section">
+          <div class="case-eyebrow">// 03 — THE OUTCOME</div>
+          <h3>What it became.</h3>
+          <div class="case-prose">
+            <p>The headline outcome is on the homepage card. A fuller stat row and the narrative behind it will land here.</p>
+          </div>
+          <div class="case-stats">
+            <div class="case-stat"><span class="label">Headline</span><span class="num">${esc(t.metric.split(' ')[0])}</span></div>
+            <div class="case-stat"><span class="label">Window</span><span class="num">—</span></div>
+            <div class="case-stat"><span class="label">Team</span><span class="num">—</span></div>
+            <div class="case-stat"><span class="label">Status</span><span class="num">—</span></div>
+          </div>
+        </section>
+        <section class="case-section">
+          <div class="case-eyebrow">// 04 — THE TAKEAWAY</div>
+          <h3>What I'd carry forward.</h3>
+          <div class="case-prose">
+            <p>The lesson worth keeping from this one.</p>
+            <p class="case-kicker">${esc(t.kicker)}</p>
+          </div>
+        </section>
+      `;
+
+      return `
+        <div class="case-header">
+          <a href="#" class="case-back" data-case-back>← Back to trail</a>
+          <div class="case-id">// Trip report ${reportNum}</div>
+          <div></div>
+        </div>
+        <div class="case-wrap">
+          <div class="case-hero">
+            <div class="case-eyebrow">${esc(t.tag)}</div>
+            <h1 class="case-name">${esc(t.name)}<span class="beacon">.</span></h1>
+            <p class="case-tagline">${esc(heroTagline)}</p>
+            <dl class="case-meta">
+              ${heroMeta.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}
+            </dl>
+            <div class="case-metric">${esc(heroMetric)}</div>
+          </div>
+          ${heroFigure}
+          ${sections}
+          <div class="case-footer">
+            <a href="#" class="case-back" data-case-back>← Back to trail</a>
+            <span class="filed">// Report filed — archived 2021</span>
+          </div>
+        </div>
+      `;
+    }
+
+    let savedScrollY = 0;
+
+    function openCase(idx) {
+      const t = trips[idx];
+      if (!t) return;
+      savedScrollY = window.scrollY;
+      caseRoot.innerHTML = caseContent(t, idx);
+      caseRoot.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('case-active');
+      // Freeze trail + topo animations: remove any scroll-driven contour/trail
+      // updates by killing scrubs. We keep ScrollTrigger registered but pause it.
+      try { gsap.utils.toArray('*'); } catch (_) {}
+      if (window.ScrollTrigger) {
+        ScrollTrigger.getAll().forEach(st => st.disable(false));
+      }
+      window.scrollTo(0, 0);
+      requestAnimationFrame(() => caseRoot.classList.add('in'));
+      // wire back links
+      caseRoot.querySelectorAll('[data-case-back]').forEach(b => {
+        b.addEventListener('click', (e) => { e.preventDefault(); closeCase(); });
+      });
+    }
+
+    function closeCase() {
+      caseRoot.classList.remove('in');
+      setTimeout(() => {
+        document.body.classList.remove('case-active');
+        caseRoot.setAttribute('aria-hidden', 'true');
+        caseRoot.innerHTML = '';
+        if (window.ScrollTrigger) {
+          ScrollTrigger.getAll().forEach(st => st.enable(false));
+          ScrollTrigger.refresh();
+        }
+        // restore scroll position
+        window.scrollTo(0, savedScrollY);
+      }, 200);
+    }
+
+    // Delegated click handler for trip-link clicks (works after re-render too)
+    document.addEventListener('click', (e) => {
+      const link = e.target.closest('.trip-link[data-trip-index]');
+      if (!link) return;
+      e.preventDefault();
+      const idx = parseInt(link.getAttribute('data-trip-index'), 10);
+      if (Number.isFinite(idx)) openCase(idx);
+    });
+
+    // ESC closes
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && document.body.classList.contains('case-active')) closeCase();
+    });
+  })();
+
+  // ---------- Theme toggle ----------
+  const html = document.documentElement;
+  const tBtn = document.getElementById('themeToggle');
+  const tLabel = document.getElementById('themeLabel');
+  const stored = localStorage.getItem('theme');
+  if (stored === 'light') { html.setAttribute('data-theme', 'light'); tLabel.textContent = 'LIGHT'; }
+  tBtn.addEventListener('click', () => {
+    const cur = html.getAttribute('data-theme');
+    if (cur === 'light') {
+      html.removeAttribute('data-theme');
+      tLabel.textContent = 'DARK';
+      localStorage.setItem('theme', 'dark');
+    } else {
+      html.setAttribute('data-theme', 'light');
+      tLabel.textContent = 'LIGHT';
+      localStorage.setItem('theme', 'light');
+    }
+  });
+
+  // ---------- Konami code easter egg ----------
+  const code = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+  let ki = 0;
+  window.addEventListener('keydown', (e) => {
+    const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+    if (k === code[ki]) {
+      ki++;
+      if (ki === code.length) {
+        ki = 0;
+        triggerKonami();
+      }
+    } else {
+      ki = (k === code[0]) ? 1 : 0;
+    }
+  });
+
+  function triggerKonami() {
+    const topo = document.getElementById('topo');
+    topo.classList.add('pixelated');
+    // 440Hz square 80ms
+    try {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      const ctx = new Ctx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'square';
+      osc.frequency.value = 440;
+      gain.gain.value = 0.08;
+      osc.connect(gain).connect(ctx.destination);
+      osc.start();
+      setTimeout(() => { osc.stop(); ctx.close(); }, 80);
+    } catch (e) {}
+    setTimeout(() => topo.classList.remove('pixelated'), 3000);
+  }
+})();
+</script>
+</body>
+</html>

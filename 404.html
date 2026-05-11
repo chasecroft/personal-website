@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>404 — off-trail</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,900;1,9..144,900&family=Inter:wght@400;500&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #0A0A0B;
+    --ink: #E8E6E1;
+    --ink-dim: rgba(232, 230, 225, 0.55);
+    --ink-faint: rgba(232, 230, 225, 0.32);
+    --accent: #FF6B47;
+    --contour: rgba(232, 230, 225, 0.08);
+  }
+  html[data-theme="light"] {
+    --bg: #F4F1EA;
+    --ink: #1A1A1C;
+    --ink-dim: rgba(26, 26, 28, 0.58);
+    --ink-faint: rgba(26, 26, 28, 0.35);
+    --accent: #FF6B47;
+    --contour: rgba(26, 26, 28, 0.10);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background-color 220ms ease, color 220ms ease;
+    position: relative;
+  }
+
+  /* LAYER 1: topo background */
+  .topo {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+    pointer-events: none;
+  }
+  .topo path {
+    fill: none;
+    stroke: var(--contour);
+    stroke-width: 0.5;
+    transition: stroke 220ms ease;
+  }
+  .topo path.index {
+    stroke-width: 0.7;
+  }
+
+  /* Theme toggle */
+  .theme-toggle {
+    position: fixed;
+    top: 28px;
+    right: 32px;
+    z-index: 10;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    color: var(--ink-dim);
+    padding: 4px 0;
+    transition: color 150ms ease;
+  }
+  .theme-toggle:hover { color: var(--accent); }
+
+  /* LAYER 2: centered content */
+  .stage {
+    position: relative;
+    z-index: 2;
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 64px 24px;
+  }
+  .stack {
+    max-width: 480px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+  }
+
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .eyebrow::before {
+    content: "";
+    display: inline-block;
+    width: 28px;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  h1.headline {
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 900;
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    line-height: 1.0;
+    letter-spacing: -0.035em;
+    color: var(--ink);
+    margin-bottom: 24px;
+    text-wrap: pretty;
+  }
+
+  .body-line {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 1.05rem;
+    line-height: 1.5;
+    color: var(--ink-dim);
+    margin-bottom: 32px;
+  }
+
+  .hiker-wrap {
+    align-self: center;
+    margin: 0 auto 32px;
+    display: block;
+    line-height: 0;
+  }
+  .hiker {
+    width: auto;
+    height: 80px;
+    display: block;
+    overflow: visible;
+  }
+  .hiker .print {
+    fill: var(--accent);
+    stroke: none;
+    opacity: 0;
+    animation: stepIn 4s ease-out infinite;
+  }
+  .hiker .print:nth-child(1) { animation-delay: 0s; }
+  .hiker .print:nth-child(2) { animation-delay: 0.5s; }
+  .hiker .print:nth-child(3) { animation-delay: 1.0s; }
+  .hiker .print:nth-child(4) { animation-delay: 1.5s; }
+  .hiker .print:nth-child(5) { animation-delay: 2.0s; }
+  @keyframes stepIn {
+    0%, 10%   { opacity: 0; }
+    20%       { opacity: 0.95; }
+    85%       { opacity: 0.95; }
+    100%      { opacity: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hiker .print { animation: none; opacity: 0.85; }
+  }
+
+  .home-link {
+    align-self: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    color: var(--accent);
+    text-decoration: none;
+    border: none;
+    transition: transform 150ms ease-out;
+    will-change: transform;
+    display: inline-block;
+  }
+  .home-link:hover {
+    transform: translateX(-2px);
+  }
+
+  .footer {
+    position: fixed;
+    bottom: 32px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    z-index: 2;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--ink-faint);
+  }
+</style>
+</head>
+<body>
+  <button class="theme-toggle" id="themeToggle" aria-label="Toggle color theme">DARK</button>
+
+  <!-- LAYER 1: topographic contours -->
+  <svg class="topo" id="topo" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <!-- 10 organic concentric contours around an off-center peak (~ x=920, y=380) -->
+    <!-- Outermost (largest) → innermost. Every 4th is an "index" contour. -->
+    <path class="index" d="M -40 720 C 140 640, 260 800, 460 760 S 760 600, 920 640 S 1240 540, 1380 600 S 1520 760, 1480 880 L 1480 980 L -40 980 Z" />
+    <path d="M 60 660 C 220 580, 360 740, 540 700 S 800 540, 960 580 S 1240 480, 1360 560 S 1460 720, 1420 820" />
+    <path d="M 140 600 C 280 540, 400 680, 580 640 S 820 480, 960 520 S 1220 440, 1320 520 S 1400 660, 1360 760" />
+    <path d="M 220 540 C 340 500, 440 620, 620 580 S 820 440, 960 470 S 1200 400, 1280 480 S 1340 600, 1300 700" />
+    <path class="index" d="M 300 480 C 400 460, 480 560, 660 520 S 820 400, 960 420 S 1180 360, 1240 440 S 1280 540, 1240 640" />
+    <path d="M 380 420 C 460 420, 520 500, 700 460 S 820 360, 960 370 S 1160 320, 1200 400 S 1220 480, 1180 580" />
+    <path d="M 460 380 C 520 380, 580 440, 740 410 S 830 330, 950 330 S 1130 290, 1160 360 S 1160 430, 1120 520" />
+    <path d="M 540 350 C 590 350, 640 400, 780 380 S 850 310, 940 305 S 1100 270, 1120 330 S 1110 390, 1070 460" />
+    <path class="index" d="M 620 330 C 670 330, 720 370, 820 360 S 870 305, 935 295 S 1060 265, 1075 310 S 1060 360, 1020 410" />
+    <path d="M 720 320 C 760 320, 810 345, 870 345 S 900 310, 935 305 S 1010 280, 1015 315 S 1000 345, 970 380" />
+  </svg>
+
+  <main class="stage">
+    <div class="stack">
+      <div class="eyebrow">// 404</div>
+      <h1 class="headline">You&rsquo;ve wandered off-trail.</h1>
+      <p class="body-line">This page isn&rsquo;t on the map. Happens to the best of us.</p>
+
+      <div class="hiker-wrap" aria-hidden="true">
+        <svg class="hiker" viewBox="0 0 160 80" xmlns="http://www.w3.org/2000/svg">
+          <!-- A trail of boot prints walking off-frame to the right.
+               Each print = a sole oval + a heel oval, slightly rotated.
+               Lefts and rights alternate, gently staggered along Y. -->
+
+          <!-- print 1 (left foot) -->
+          <g class="print" transform="translate(14 56) rotate(-14)">
+            <ellipse cx="0" cy="0" rx="6" ry="3.6" />
+            <ellipse cx="0" cy="8" rx="3.4" ry="2.4" />
+          </g>
+
+          <!-- print 2 (right foot) -->
+          <g class="print" transform="translate(44 44) rotate(10)">
+            <ellipse cx="0" cy="0" rx="6" ry="3.6" />
+            <ellipse cx="0" cy="8" rx="3.4" ry="2.4" />
+          </g>
+
+          <!-- print 3 (left) -->
+          <g class="print" transform="translate(76 52) rotate(-12)">
+            <ellipse cx="0" cy="0" rx="6" ry="3.6" />
+            <ellipse cx="0" cy="8" rx="3.4" ry="2.4" />
+          </g>
+
+          <!-- print 4 (right) -->
+          <g class="print" transform="translate(108 40) rotate(14)">
+            <ellipse cx="0" cy="0" rx="6" ry="3.6" />
+            <ellipse cx="0" cy="8" rx="3.4" ry="2.4" />
+          </g>
+
+          <!-- print 5 (left) — fading off the edge -->
+          <g class="print" transform="translate(140 48) rotate(-10)">
+            <ellipse cx="0" cy="0" rx="6" ry="3.6" />
+            <ellipse cx="0" cy="8" rx="3.4" ry="2.4" />
+          </g>
+        </svg>
+      </div>
+
+      <a class="home-link" id="homeLink" href="/">&larr; back to the trailhead</a>
+    </div>
+  </main>
+
+  <div class="footer">// built in Denver</div>
+
+<script>
+(function() {
+  // --- Context-aware home link ---------------------------------------------
+  // Route the "back to the trailhead" link based on auth state.
+  //   logged out → "/"            (marketing homepage)
+  //   logged in  → "/app"         (authenticated app home)
+  // Detection is intentionally permissive: we look at common signals so this
+  // works against most stacks without server-side rendering.
+  // When served from a real domain, "/" is the marketing homepage.
+  // When opened as a local file (file:// or sandbox preview), there's no
+  // server route — fall back to index.html so the link actually goes somewhere.
+  const isFileContext = location.protocol === "file:" || /\.html?$/i.test(location.pathname);
+  const MARKETING_HOME = isFileContext ? "index.html" : "/";
+  const APP_HOME = isFileContext ? "index.html" : "/app";
+
+  function isLoggedIn() {
+    try {
+      // 1. Cookie-based session (most common: "session", "sid", "auth", "token")
+      const cookieHit = /(?:^|;\s*)(session|sid|sessionid|auth|authToken|token|access_token|jwt)=/i
+        .test(document.cookie || "");
+      if (cookieHit) return true;
+
+      // 2. Local/session storage tokens used by SPA auth (Auth0, Clerk, Supabase, etc.)
+      const keys = ["token", "authToken", "access_token", "id_token", "jwt",
+                    "supabase.auth.token", "clerk-db-jwt", "user"];
+      for (const k of keys) {
+        if (localStorage.getItem(k) || sessionStorage.getItem(k)) return true;
+      }
+    } catch (e) { /* storage blocked → treat as logged out */ }
+    return false;
+  }
+
+  const homeLink = document.getElementById('homeLink');
+  if (homeLink) {
+    homeLink.setAttribute('href', isLoggedIn() ? APP_HOME : MARKETING_HOME);
+  }
+
+  // --- Theme toggle --------------------------------------------------------
+  const root = document.documentElement;
+  const toggle = document.getElementById('themeToggle');
+
+  function apply(theme) {
+    root.setAttribute('data-theme', theme);
+    // Button shows the CURRENT mode label
+    toggle.textContent = theme === 'light' ? 'LIGHT' : 'DARK';
+  }
+
+  let stored = null;
+  try { stored = localStorage.getItem('theme'); } catch (e) {}
+  const initial = (stored === 'light' || stored === 'dark') ? stored : 'dark';
+  apply(initial);
+
+  toggle.addEventListener('click', function() {
+    const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+    apply(next);
+    try { localStorage.setItem('theme', next); } catch (e) {}
+  });
+})();
+</script>
+</body>
+</html>
