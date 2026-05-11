@@ -226,38 +226,11 @@
   }
 
   /* Photo grid */
-  .photo-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2px;
-    background: var(--rule);
-    border: 1px solid var(--rule);
-  }
-  @media (max-width: 600px) { .photo-grid { grid-template-columns: 1fr; } }
-
-  .photo-cell {
-    aspect-ratio: 16 / 10;
-    background: rgba(255,107,71,0.05);
-    overflow: hidden;
-    position: relative;
-  }
-  .photo-cell img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-    display: block;
-  }
-  .photo-cell.missing {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.18em;
-    color: rgba(255,107,71,0.3);
-  }
-  .photo-cell.missing::after { content: "[ PHOTO ]"; }
+    .photo-gallery { columns: 2; column-gap: 2px; }
+  .photo-gallery .photo-item { break-inside: avoid; margin-bottom: 2px; }
+  .photo-gallery .photo-item img { width: 100%; height: auto; display: block; }
+  .photo-gallery .photo-item.wide { column-span: all; }
+  @media (max-width: 600px) { .photo-gallery { columns: 1; } }
   .photo-caption {
     font-family: 'JetBrains Mono', monospace;
     font-size: 10px;
@@ -374,7 +347,13 @@
 
   <!-- Photos -->
   <div class="section-label">// Reference</div>
-  <div class="photo-grid" id="photoGrid"></div>
+  <div class="photo-gallery">
+  <div class="photo-item"><img src="/assets/work/dropbox-paper/dropbox-paper-1.png" alt="Market map comparing Paper and Dropbox MAUs across customer segments"></div>
+  <div class="photo-item"><img src="/assets/work/dropbox-paper/dropbox-paper-2.png" alt="Product architecture diagram covering creation, navigation, and context surfaces"></div>
+  <div class="photo-item"><img src="/assets/work/dropbox-paper/dropbox-paper-3.png" alt="Dropbox Paper document view with third-party app integrations"></div>
+  <div class="photo-item"><img src="/assets/work/dropbox-paper/dropbox-paper-4.png" alt="Paper topics view showing document organization and collaborators"></div>
+  <div class="photo-item wide"><img src="/assets/work/dropbox-paper/dropbox-paper-5.png" alt="Editor with context panel surfacing related documents and subject experts"></div>
+</div>
 
   <!-- Footer -->
   <div class="page-footer">
@@ -386,23 +365,6 @@
 
 <script>
 // Photos
-(function() {
-  const grid = document.getElementById('photoGrid');
-  const folder = '/assets/work/dropbox-paper';
-  for (let i = 1; i <= 4; i++) {
-    const cell = document.createElement('div');
-    cell.className = 'photo-cell';
-    const img = document.createElement('img');
-    img.src = `${folder}/photo-${i}.jpg`;
-    img.alt = `Dropbox Paper reference photo ${i}`;
-    img.onerror = function() {
-      this.remove();
-      cell.classList.add('missing');
-    };
-    cell.appendChild(img);
-    grid.appendChild(cell);
-  }
-})();
 
 // Theme
 (function() {

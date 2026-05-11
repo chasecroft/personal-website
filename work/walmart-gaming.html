@@ -176,30 +176,11 @@
     margin-bottom: 8px;
   }
   .metric-label { font-family: 'Inter', sans-serif; font-size: 0.8rem; line-height: 1.4; color: var(--ink-dim); }
-  .photo-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2px;
-    background: var(--rule);
-    border: 1px solid var(--rule);
-  }
-  @media (max-width: 600px) { .photo-grid { grid-template-columns: 1fr; } }
-  .photo-cell {
-    aspect-ratio: 16 / 10;
-    background: rgba(255,107,71,0.05);
-    overflow: hidden;
-  }
-  .photo-cell img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .photo-cell.missing {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.18em;
-    color: rgba(255,107,71,0.3);
-  }
-  .photo-cell.missing::after { content: "[ PHOTO ]"; }
+    .photo-gallery { columns: 2; column-gap: 2px; }
+  .photo-gallery .photo-item { break-inside: avoid; margin-bottom: 2px; }
+  .photo-gallery .photo-item img { width: 100%; height: auto; display: block; }
+  .photo-gallery .photo-item.wide { column-span: all; }
+  @media (max-width: 600px) { .photo-gallery { columns: 1; } }
   .kicker-block { border-left: 2px solid var(--accent); padding: 4px 0 4px 20px; }
   .kicker-block p {
     font-family: 'Fraunces', Georgia, serif;
@@ -305,7 +286,10 @@
   <div class="rule"></div>
 
   <div class="section-label">// Reference</div>
-  <div class="photo-grid" id="photoGrid"></div>
+  <div class="photo-gallery">
+  <div class="photo-item wide"><img src="/assets/work/walmart-gaming/walmart-gaming-1.png" alt="Platform architecture for a cloud gaming subscription service built on edge computing"></div>
+  <div class="photo-item wide"><img src="/assets/work/walmart-gaming/walmart-gaming-2.png" alt="Market data showing the shift from boxed to digital: 95% of gaming revenue now digital"></div>
+</div>
 
   <div class="page-footer">
     <a class="back-link" href="/">← Back to Chase Croft</a>
@@ -315,20 +299,6 @@
 </main>
 
 <script>
-(function() {
-  const grid = document.getElementById('photoGrid');
-  const folder = '/assets/work/walmart-gaming';
-  for (let i = 1; i <= 4; i++) {
-    const cell = document.createElement('div');
-    cell.className = 'photo-cell';
-    const img = document.createElement('img');
-    img.src = `${folder}/photo-${i}.jpg`;
-    img.alt = `Walmart Gaming reference photo ${i}`;
-    img.onerror = function() { this.remove(); cell.classList.add('missing'); };
-    cell.appendChild(img);
-    grid.appendChild(cell);
-  }
-})();
 
 (function() {
   const root = document.documentElement;
