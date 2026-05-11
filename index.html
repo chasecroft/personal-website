@@ -1304,7 +1304,8 @@
     "metric": "DROPBOX DASH",
     "role": "HEAD OF PAPER · DROPBOX NEW VENTURES",
     "outcome": "Incubated the second act that became Dropbox Dash. Migrated 80k B2B customers, scaled the team 4x post-greenlight, and reshaped the company's bet from file management to knowledge.",
-    "kicker": "Defined the wedge for the company's $1B+ second act."
+    "kicker": "Defined the wedge for the company's $1B+ second act.",
+    "url": "/work/dropbox-paper"
   },
   {
     "name": "Walmart Gaming",
@@ -2193,7 +2194,10 @@
           </div>
           <div>
             <p class="trip-outcome">${escapeHtml(t.outcome)}<span class="kicker">${escapeHtml(t.kicker)}</span></p>
-            <span class="trip-link-placeholder" aria-disabled="true">Details Coming Soon</span>
+            ${t.url
+              ? `<a class="trip-link" href="${t.url}">View case study &rarr;</a>`
+              : `<span class="trip-link-placeholder" aria-disabled="true">Details Coming Soon</span>`
+            }
           </div>
         </article>
       `;}).join('');
