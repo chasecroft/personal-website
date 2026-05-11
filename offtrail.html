@@ -540,6 +540,18 @@
   .photo-cell.photo-missing::after {
     content: "[ PHOTO ]";
   }
+  .photo-pre-iphone {
+    grid-column: 1 / -1;
+    aspect-ratio: auto;
+    min-height: 120px;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 13px;
+  }
+  .photo-pre-iphone .pre-iphone-emoji {
+    font-size: 32px;
+    line-height: 1;
+  }
 
   /* ---------- Reduced motion ---------- */
   @media (prefers-reduced-motion: reduce) {
@@ -814,7 +826,7 @@ const COUNTRIES = [
   { code: 'ca',     iso: 'CA', name: 'Canada',              folder: 'canada',       tripType: 'MANY TRIPS',                paragraphs: ["Mom and cousins lived here, so it became the country I returned to most without ever really planning to. Vancouver for work, Toronto for family, Quebec City for dog sledding through a town that felt three centuries removed from the rest of the continent."] },
   { code: 'mx',     iso: 'MX', name: 'Mexico',              folder: 'mexico',       tripType: 'MANY TRIPS',                paragraphs: ["Weddings in Puerto Vallarta, bachelor parties in Cabo, cenotes in the Yucatan.", "The one that stuck: Thanksgiving in Mexico City, ducking between speakeasies and watching lucha libre matches with friends."] },
   { code: 'cr',     iso: 'CR', name: 'Costa Rica',          folder: 'costa-rica',   tripType: 'FAMILY',                    paragraphs: ["Visiting mom at the villa she bought deep in the jungle. Howler monkeys showed up for breakfast every morning. Waterfall hikes in the afternoon."] },
-  { code: 'bs',     iso: 'BS', name: 'Bahamas',             folder: 'bahamas',      tripType: 'SPRING BREAK',              paragraphs: ["First trip abroad on my own. College spring break, tequila shots, reggaeton until sunrise. Nothing deeper than that, and that was the point."] },
+  { code: 'bs',     iso: 'BS', name: 'Bahamas',             folder: 'bahamas',      tripType: 'SPRING BREAK',              preIphone: true, paragraphs: ["First trip abroad on my own. College spring break, tequila shots, reggaeton until sunrise. Nothing deeper than that, and that was the point."] },
   { code: 'co',     iso: 'CO', name: 'Colombia',            folder: 'colombia',     tripType: 'BACHELOR PARTY',            paragraphs: ["Bachelor party with a group of friends from every era of my life finally in one place. Cocktails on the old fortress walls of Cartagena while the sun dropped into the Caribbean."] },
   { code: 'ar',     iso: 'AR', name: 'Argentina',           folder: 'argentina',    tripType: 'PATAGONIA + WORLD CUP',     paragraphs: ["Three weeks hiking El Chalten and Torres del Paine, all the way down to the glaciers at the southern tip.", "Caught the entire Argentina World Cup run while we were there -- ended up in Buenos Aires the night they won it. The streets did not sleep."] },
   { code: 'tz',     iso: 'TZ', name: 'Tanzania',            folder: 'tanzania',     tripType: 'SAFARI',                    paragraphs: ["Serengeti safari during the Great Migration. Lions, elephants, wild dogs, leopards draped over tree branches. The hotel had its own private watering hole; the animals came to us."] },
@@ -937,16 +949,23 @@ function renderSheet(country) {
   sheetMeta.innerHTML = `${country.tripType || ''}`;
   sheetWriteup.innerHTML = (country.paragraphs || []).map(p => `<p>${p}</p>`).join('');
   sheetPhotos.innerHTML = '';
-  const folder = country.folder || country.name.toLowerCase().replace(/\s+/g, '-');
-  for (let i = 1; i <= 4; i++) {
+  if (country.preIphone) {
     const cell = document.createElement('div');
-    cell.className = 'photo-cell';
-    const img = document.createElement('img');
-    img.src = `assets/countries/${folder}/photo-${i}.jpg`;
-    img.alt = `${country.name} photo ${i}`;
-    img.onerror = function() { this.parentNode.classList.add('photo-missing'); this.remove(); };
-    cell.appendChild(img);
+    cell.className = 'photo-cell photo-pre-iphone';
+    cell.innerHTML = '<span class="pre-iphone-emoji">:)</span><span>pre-iPhone era — no photos survived</span>';
     sheetPhotos.appendChild(cell);
+  } else {
+    const folder = country.folder || country.name.toLowerCase().replace(/\s+/g, '-');
+    for (let i = 1; i <= 4; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'photo-cell';
+      const img = document.createElement('img');
+      img.src = `assets/countries/${folder}/photo-${i}.jpg`;
+      img.alt = `${country.name} photo ${i}`;
+      img.onerror = function() { this.parentNode.classList.add('photo-missing'); this.remove(); };
+      cell.appendChild(img);
+      sheetPhotos.appendChild(cell);
+    }
   }
 }
 
