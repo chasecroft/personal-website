@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -754,15 +754,18 @@
 (function themeToggle() {
   const btn = document.getElementById('themeToggle');
   const html = document.documentElement;
-  function sync() {
-    const t = html.getAttribute('data-theme');
-    btn.textContent = (t === 'light') ? 'DARK' : 'LIGHT';
+  function apply(theme) {
+    html.setAttribute('data-theme', theme);
+    btn.textContent = theme === 'light' ? 'DARK' : 'LIGHT';
   }
-  sync();
+  let stored = null;
+  try { stored = localStorage.getItem('theme'); } catch(e) {}
+  const systemPref = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  apply((stored === 'light' || stored === 'dark') ? stored : systemPref);
   btn.addEventListener('click', () => {
-    const cur = html.getAttribute('data-theme') || 'dark';
-    html.setAttribute('data-theme', cur === 'dark' ? 'light' : 'dark');
-    sync();
+    const next = html.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+    apply(next);
+    try { localStorage.setItem('theme', next); } catch(e) {}
   });
 })();
 

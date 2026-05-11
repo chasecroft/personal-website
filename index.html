@@ -2515,7 +2515,9 @@
   const tBtn = document.getElementById('themeToggle');
   const tLabel = document.getElementById('themeLabel');
   const stored = localStorage.getItem('theme');
-  if (stored === 'light') { html.setAttribute('data-theme', 'light'); tLabel.textContent = 'LIGHT'; }
+  const systemPref = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  const initial = (stored === 'light' || stored === 'dark') ? stored : systemPref;
+  if (initial === 'light') { html.setAttribute('data-theme', 'light'); tLabel.textContent = 'LIGHT'; }
   tBtn.addEventListener('click', () => {
     const cur = html.getAttribute('data-theme');
     if (cur === 'light') {
