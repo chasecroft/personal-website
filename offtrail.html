@@ -937,6 +937,7 @@ const sheet = document.getElementById('sheet');
 const backdrop = document.getElementById('backdrop');
 const sheetClose = document.getElementById('sheetClose');
 const sheetContent = document.getElementById('sheetContent');
+const sheetScroll = document.querySelector('.sheet-scroll');
 const sheetTitle = document.getElementById('sheetTitle');
 const sheetMeta = document.getElementById('sheetMeta');
 const sheetWriteup = document.getElementById('sheetWriteup');
@@ -978,6 +979,7 @@ function openSheet(iso) {
     sheetContent.classList.add('fading');
     setTimeout(() => {
       renderSheet(country);
+      sheetScroll.scrollTop = 0;
       sheetContent.classList.remove('fading');
     }, 200);
     return;
@@ -988,6 +990,7 @@ function openSheet(iso) {
   sheet.classList.remove('closing');
   // need next frame for transition
   requestAnimationFrame(() => {
+    sheetScroll.scrollTop = 0;
     sheet.classList.add('open');
     backdrop.classList.add('open');
   });
