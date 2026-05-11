@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Chase Croft — From trailhead.</title>
+<title>Chase Croft</title>
+<link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,900;1,9..144,400;1,9..144,900&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -392,6 +393,16 @@
     transition: border-color 200ms ease;
   }
   .trip-link:hover { border-bottom-color: var(--accent); }
+  .trip-link-placeholder {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-dim);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    align-self: flex-start;
+    opacity: 0.5;
+    cursor: default;
+  }
 
   /* ---------- On the mountain (Snug — second hero moment) ---------- */
   #s4 {
@@ -973,7 +984,7 @@
     border-top: 1px solid var(--rule);
     padding-top: 4vh;
     display: grid;
-    grid-template-columns: max-content 1fr;
+    grid-template-columns: 112px 1fr;
     gap: 2vw;
   }
   @media (max-width: 720px) { .report { grid-template-columns: 1fr; gap: 2vh; } }
@@ -1109,7 +1120,7 @@
   .footer-inner a { color: var(--ink-dim); text-decoration: none; transition: color 200ms ease; }
   .footer-inner a:hover { color: var(--accent); }
   .footer-links { display: flex; gap: 24px; }
-  .footer-offtrail { opacity: 0.5; font-size: 10px; }
+  .footer-offtrail { font-size: 11px; }
 
   /* ---------- Pixelate easter egg ---------- */
   .pixelated svg { image-rendering: pixelated; filter: url(#pixelate); }
@@ -1277,68 +1288,68 @@
 <script id="trips-data" type="application/json">
 [
   {
-    "name": "Lantern",
+    "name": "Dropbox Paper",
+    "tag": "// PRODUCT INCUBATION",
+    "metric": "DROPBOX DASH",
+    "role": "HEAD OF PAPER · DROPBOX NEW VENTURES",
+    "outcome": "Incubated the second act that became Dropbox Dash. Migrated 80k B2B customers, scaled the team 4x post-greenlight, and reshaped the company's bet from file management to knowledge.",
+    "kicker": "Defined the wedge for the company's $1B+ second act."
+  },
+  {
+    "name": "Walmart Gaming",
+    "tag": "// PRODUCT INCUBATION",
+    "metric": "$100M PROJECT",
+    "role": "HEAD OF DIGITAL GAMING · WALMART",
+    "outcome": "Turned a one-paragraph pitch into a funded “Netflix for Gaming” platform. Greenlit a $50M acquisition and a two-year build on top of a game streaming service.",
+    "kicker": "Took a paragraph to a hundred million dollars."
+  },
+  {
+    "name": "WorkMade",
+    "tag": "// GO TO MARKET",
+    "metric": "50% CAC CUT",
+    "role": "HEAD OF PRODUCT · WORKMADE",
+    "outcome": "Inherited a product on fire — sub-5% activation, 10% onboarding, daily P0 outages. Doubled onboarding, cut CAC in half, and pushed reliability to three nines.",
+    "kicker": "Turned a launch disaster into a working funnel."
+  },
+  {
+    "name": "Tally Save",
+    "tag": "// GO TO MARKET",
+    "metric": "SAVED FROM CUT",
+    "role": "SENIOR PM · TALLY",
+    "outcome": "Launched a wealth-building app at 2x our target CAC. In six weeks, ran 25 coordinated changes across product, ads, and store copy to cut CAC 50% and lift retention 25%.",
+    "kicker": "Pulled a product off the chopping block."
+  },
+  {
+    "name": "Tally Partner API",
+    "tag": "// 0→MARKET",
+    "metric": "3x CHEAPER CAC",
+    "role": "SENIOR PM · TALLY",
+    "outcome": "Built Tally's first public API and capital markets marketplace in two months. Acquired users 3x cheaper than paid, signed first lender partners, and seeded the company's eventual B2B pivot.",
+    "kicker": "Built the rails for the company's next chapter."
+  },
+  {
+    "name": "Mischief",
+    "tag": "// FOUNDER",
+    "metric": "WB · SQUARE ENIX · SEGA",
+    "role": "FOUNDER & CEO · MISCHIEF",
+    "outcome": "Built tools for streamers to sell games on Twitch, YouTube, and Mixer. Did design, landing pages, ad ops, and sold the model to top-tier game publishers solo before hiring out.",
+    "kicker": "Wore every hat until the company could afford others."
+  },
+  {
+    "name": "WorkMade Onboarding",
     "tag": "// PRODUCT LAUNCH",
-    "metric": "50K MAU",
-    "role": "FOUNDER · 2018–2021",
-    "outcome": "Consumer journaling app. 0 → 50k MAU in 9 months, acquired by a wellness platform.",
-    "kicker": "Defined the wedge that made acquisition cheap."
+    "metric": "92% AI ACCURACY",
+    "role": "HEAD OF PRODUCT · WORKMADE",
+    "outcome": "Onboarding required users to sort hundreds of transactions in 20+ minutes — a churn machine. Shipped an AI classifier at 92% accuracy, cutting manual work 60% and lifting onboarding 30%.",
+    "kicker": "Replaced a 20-minute slog with a smart default."
   },
   {
-    "name": "Field Notes",
-    "tag": "// INTERNAL TOOL",
-    "metric": "6 PILOTS",
-    "role": "EARLY PM · DROPBOX INCUBATOR · 2016–2018",
-    "outcome": "Internal collaboration tool for field teams. Shipped MVP in 11 weeks, 6 enterprise pilots.",
-    "kicker": "Won internal greenlight to ship at scale."
-  },
-  {
-    "name": "Cart Studio",
-    "tag": "// 0→MARKET",
-    "metric": "40+ CUSTOMERS",
-    "role": "PROD LEAD · WALMART STORE №8 · 2021–2023",
-    "outcome": "Headless commerce SDK for emerging brands. 40+ paying customers in year one.",
-    "kicker": "Shifted the platform's monetization model."
-  },
-  {
-    "name": "Pinecone Labs",
-    "tag": "// FOUNDING TEAM",
-    "metric": "$2M RAISED",
-    "role": "CO-FOUNDER · 2014–2017",
-    "outcome": "Prosumer audio tools. $2M raised, profitable by year two, sold to a hardware OEM.",
-    "kicker": "Sold the company two years after launch."
-  },
-  {
-    "name": "Foothill",
-    "tag": "// GROWTH",
-    "metric": "3X RETENTION",
-    "role": "PROD LEAD · 2019–2020",
-    "outcome": "Subscription wellness platform. Doubled monthly retention through onboarding redesign and milestone-based reactivation.",
-    "kicker": "Made the metric the team optimized for."
-  },
-  {
-    "name": "Bivy",
-    "tag": "// FOUNDING TEAM",
-    "metric": "SERIES A",
-    "role": "EARLY PM · 2017–2019",
-    "outcome": "Outdoor logistics marketplace. Took the product from beta to Series A close in 14 months.",
-    "kicker": "Defined the marketplace mechanics that scaled."
-  },
-  {
-    "name": "Cairn Health",
-    "tag": "// 0→MARKET",
-    "metric": "12 LAUNCH PARTNERS",
-    "role": "FOUNDER · 2015–2017",
-    "outcome": "Telehealth scheduling for clinics. Launched with 12 paying clinic partners in year one.",
-    "kicker": "Validated demand before the category had a name."
-  },
-  {
-    "name": "Compass",
-    "tag": "// INTERNAL TOOL",
-    "metric": "ADOPTED CO-WIDE",
-    "role": "PROD LEAD · WALMART INCUBATOR · 2020–2021",
-    "outcome": "Internal goal-setting tool. Adopted across 14 corporate teams within six months of launch.",
-    "kicker": "Replaced quarterly review chaos with a working ritual."
+    "name": "Tally Payoff Plans",
+    "tag": "// PRODUCT LAUNCH",
+    "metric": "3x AUTOPAY OPT-IN",
+    "role": "SENIOR PM · TALLY",
+    "outcome": "Ran 40 generative research sessions to design payoff plans that matched user comfort, not just business goals. Lifted payment rates 10% and tripled autopay opt-in.",
+    "kicker": "Found the line where user trust met business ambition."
   }
 ]
 </script>
@@ -1423,37 +1434,37 @@
       <div class="report">
         <div class="report-meta">
           <div>RPT 001</div>
-          <div>Mar 14, 2024</div>
-          <div>Conditions: <span class="cond-word">clear</span></div>
+          <div>Nov 12, 2024</div>
+          <div>Conditions: <span class="cond-word">stormy</span></div>
         </div>
         <div>
-          <div class="report-header">"He found the product before we did."</div>
-          <p class="report-body">Chase joined when our hypothesis was three people in a Notion doc. Within a quarter he'd run six prototypes past real users and killed the four that didn't matter. We shipped the right thing the first time, which almost never happens.</p>
-          <div class="report-attr">— S. PATEL · CO-FOUNDER, NORTHWIND</div>
+          <div class="report-header">"He made me a better founder."</div>
+          <p class="report-body">Chase joined WorkMade during a complex early stage with a lot of moving parts. He jumped in, adapted fast, and kept the team calm when things got hectic. He connected dots across the full customer journey and built narratives that held up in front of the board. I'd fight to work with him again.</p>
+          <div class="report-attr">&#8211; NICK SIMPSON · CEO, WORKMADE</div>
         </div>
       </div>
       <div class="report">
         <div class="report-meta">
           <div>RPT 002</div>
-          <div>Sep 02, 2023</div>
-          <div>Conditions: <span class="cond-word">stormy</span></div>
+          <div>Aug 22, 2024</div>
+          <div>Conditions: <span class="cond-word">turbulent</span></div>
         </div>
         <div>
-          <div class="report-header">"Calm in the messy middle."</div>
-          <p class="report-body">We hit a wall at month four and the team was fracturing. Chase came in two days a week, rebuilt our weekly cadence, and made the hard calls about what to cut. It felt less like a consultant and more like a co-founder who would leave on time.</p>
-          <div class="report-attr">— J. OKAFOR · FOUNDER, BASIN</div>
+          <div class="report-header">"Our business made a remarkable turnaround."</div>
+          <p class="report-body">Chase joined during a critical period and rebuilt our product team from the ground up. He brought insight our business genuinely needed and set a new standard for execution across the org. The turnaround was real and measurable.</p>
+          <div class="report-attr">&#8211; DANIEL USENKO · CEO, PIXELLU</div>
         </div>
       </div>
       <div class="report">
         <div class="report-meta">
           <div>RPT 003</div>
-          <div>Nov 21, 2022</div>
-          <div>Conditions: <span class="cond-word">bluebird</span></div>
+          <div>Feb 18, 2026</div>
+          <div>Conditions: <span class="cond-word">low fog</span></div>
         </div>
         <div>
-          <div class="report-header">"He'll tell you what your investors won't."</div>
-          <p class="report-body">Honest, fast, and never precious about his own ideas. The first time he told me to scrap a feature I loved, I knew I'd hire him for everything after.</p>
-          <div class="report-attr">— M. ALVAREZ · GP, SEED&amp;SUMMIT</div>
+          <div class="report-header">"He runs ahead of the problems you know about."</div>
+          <p class="report-body">Chase is sharp, thorough, and data driven. He distills complex issues to their core, then builds and executes against them. He's a proactive self starter who leans in and gets ahead of problems before they surface. He's helped us clarify positioning, org, design, marketing, and value prop.</p>
+          <div class="report-attr">&#8211; STAVROS LEE · CEO, ONCADE</div>
         </div>
       </div>
     </div>
@@ -1523,11 +1534,12 @@
     <div>© 2026 Chase Croft</div>
     <div>// built in Denver</div>
     <div class="footer-links">
-      <a href="#">Snug</a>
-      <a href="#">LinkedIn</a>
-      <a href="#">Twitter</a>
+      <a href="https://www.joinsnug.com" target="_blank" rel="noopener">Snug</a>
+      <a href="https://www.linkedin.com/in/chasecroft" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://x.com/chasecroft34" target="_blank" rel="noopener">Twitter</a>
+      <a href="https://www.threads.com/chasecroft_" target="_blank" rel="noopener">Threads</a>
     </div>
-    <a href="404.html" class="footer-offtrail">// off-trail</a>
+    <a href="offtrail.html" class="footer-offtrail">// off-trail</a>
   </div>
 </footer>
 
@@ -2170,7 +2182,7 @@
           </div>
           <div>
             <p class="trip-outcome">${escapeHtml(t.outcome)}<span class="kicker">${escapeHtml(t.kicker)}</span></p>
-            <a href="#" class="trip-link" data-trip-index="${idx}">Trip report →</a>
+            <span class="trip-link-placeholder" aria-disabled="true">Details Coming Soon</span>
           </div>
         </article>
       `;}).join('');
@@ -2259,15 +2271,11 @@
         company: form.company.value.trim(),
         email: form.email.value.trim()
       };
-      // Stub — real wiring lands in production codebase (target: chase@joinsnug.com)
-      try {
-        fetch('/api/investor-request', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
-        }).catch(() => {});
-      } catch (_) {}
-      console.log('[investor-request]', data);
+      fetch('https://formspree.io/f/xqenwedl', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ name: data.name, company: data.company, email: data.email })
+      }).catch(() => {});
       form.reset();
       close();
       // toast appears just after modal close so it's not hidden behind backdrop

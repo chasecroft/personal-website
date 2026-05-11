@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Chase Croft — Off-Trail.</title>
+<title>Chase Croft</title>
+<link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,900;1,9..144,400;1,9..144,900&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -351,9 +352,9 @@
     fill: rgba(255,107,71,0.70);
   }
   #worldMap path.home {
-    fill: transparent;
+    fill: rgba(255,107,71,0.18);
     stroke: var(--accent);
-    stroke-width: 1;
+    stroke-width: 1.5;
     pointer-events: none;
   }
   .home-label {
@@ -388,7 +389,7 @@
   }
   .legend-item { display: flex; align-items: center; gap: 10px; }
   .legend-swatch { width: 14px; height: 10px; border: 0.5px solid var(--accent); background: rgba(255,107,71,0.30); }
-  .legend-swatch.home { background: transparent; border-width: 1px; }
+  .legend-swatch.home { background: rgba(255,107,71,0.18); border-width: 1.5px; }
   .legend-swatch.unvisited { background: transparent; border: 0.5px solid var(--country-stroke); }
   .legend-count { color: var(--ink); font-weight: 500; }
 
@@ -518,6 +519,15 @@
     letter-spacing: 0.18em;
     text-transform: uppercase;
     color: rgba(255,107,71,0.7);
+    overflow: hidden;
+  }
+  .photo-cell img {
+    width: 100%; height: 100%;
+    object-fit: cover; object-position: center;
+    display: block;
+  }
+  .photo-cell.photo-missing::after {
+    content: "[ PHOTO ]";
   }
 
   /* ---------- Reduced motion ---------- */
@@ -560,10 +570,10 @@
     <div class="eyebrow">// CURRENTLY</div>
     <h2 class="section-title">Right now.</h2>
     <ul class="now-list">
-      <li class="now-line"><span class="now-dot"></span><span class="now-label">Reading:</span><span class="now-value">[ PLACEHOLDER BOOK ]</span></li>
-      <li class="now-line"><span class="now-dot"></span><span class="now-label">Playing:</span><span class="now-value">[ PLACEHOLDER GAME ]</span></li>
+      <li class="now-line"><span class="now-dot"></span><span class="now-label">Reading:</span><span class="now-value">Dune</span></li>
+      <li class="now-line"><span class="now-dot"></span><span class="now-label">Playing:</span><span class="now-value">Doom Dark Ages</span></li>
       <li class="now-line"><span class="now-dot"></span><span class="now-label">Building:</span><span class="now-value">Snug</span></li>
-      <li class="now-line"><span class="now-dot"></span><span class="now-label">Climbing:</span><span class="now-value">[ PLACEHOLDER PEAK ]</span></li>
+      <li class="now-line"><span class="now-dot"></span><span class="now-label">Adventuring:</span><span class="now-value">Eastern Europe</span></li>
     </ul>
   </div>
 </section>
@@ -646,7 +656,7 @@
     </div>
     <div class="map-legend">
       <span class="legend-item"><span class="legend-swatch"></span><span class="legend-count" id="legendVisited">35</span> visited</span>
-      <span class="legend-item"><span class="legend-swatch home"></span>1 home base</span>
+      <span class="legend-item"><span class="legend-swatch home"></span>home base</span>
       <span class="legend-item"><span class="legend-swatch unvisited"></span>the rest, pending</span>
     </div>
   </div>
@@ -759,10 +769,12 @@
    TOPICS
    ============================================================ */
 const TOPICS = [
-  { num: '01', title: 'How marketplaces find liquidity', desc: "Why some marketplaces compound and others stall. Most \u201C0 to 1\u201D failures are actually liquidity failures." },
-  { num: '02', title: 'What makes outdoor gear actually good', desc: 'The functional vs. fashion divide. Why most "performance" jackets are overengineered.' },
-  { num: '03', title: 'Operational excellence in early teams', desc: "How to run a five-person company so it doesn't break at fifteen." },
-  { num: '04', title: 'Why dating apps are broken', desc: 'Optimization mismatch — they optimize for swipes, users want second dates. (Hence Snug.)' }
+  { num: '01', title: '0-to-1 product management', desc: 'My wheelhouse: productivity tools, marketplaces, commerce, and fintech. More broadly, anything that nudges people toward better behavior. Hard pass on anything designed to be addictive.' },
+  { num: '02', title: 'Scaling product orgs past the founder', desc: "How to build a product team that doesn't require the founder to make every call. I've seen this go right and wrong at every size from 5 to 500." },
+  { num: '03', title: 'Why dating apps are broken', desc: 'Optimization mismatch. They optimize for swipes; users want second dates. The product is the problem. (Hence Snug.)' },
+  { num: '04', title: 'Markets as a research habit', desc: 'Investing as a forcing function for understanding business models. The best product people I know think like investors whether or not they trade.' },
+  { num: '05', title: 'Travel as immersion, not tourism', desc: "Moving slow enough to actually understand a place. Local food, hard trails, and conversations that don't happen on guided tours. I'd rather do one country deeply than five countries quickly." },
+  { num: '06', title: 'Civic data', desc: 'Public data as a tool for political accountability. How to make representative performance legible to normal voters, not pundits. The average person has more leverage than they think.' }
 ];
 (function renderTopics() {
   const root = document.getElementById('topicsList');
@@ -785,41 +797,41 @@ const TOPICS = [
    ============================================================ */
 // ISO 3166-1 alpha-2 codes used by simple-world-map paths
 const COUNTRIES = [
-  { code: 'ca', iso: 'CA', name: 'Canada',       year: '—', vibe: 'Roadtrip' },
-  { code: 'mx', iso: 'MX', name: 'Mexico',       year: '—', vibe: 'Roadtrip' },
-  { code: 'cr', iso: 'CR', name: 'Costa Rica',   year: '—', vibe: 'Jungle' },
-  { code: 'bs', iso: 'BS', name: 'Bahamas',      year: '—', vibe: 'Coast' },
-  { code: 'co', iso: 'CO', name: 'Colombia',     year: '—', vibe: 'Jungle' },
-  { code: 'ar', iso: 'AR', name: 'Argentina',    year: '—', vibe: 'Mountains' },
-  { code: 'tz', iso: 'TZ', name: 'Tanzania',     year: '—', vibe: 'Backcountry' },
-  { code: 'eg', iso: 'EG', name: 'Egypt',        year: '—', vibe: 'Desert' },
-  { code: 'ae', iso: 'AE', name: 'UAE',          year: '—', vibe: 'Cities' },
-  { code: 'il', iso: 'IL', name: 'Israel',       year: '—', vibe: 'Desert' },
-  { code: 'in', iso: 'IN', name: 'India',        year: '—', vibe: 'Jungle' },
-  { code: 'jp', iso: 'JP', name: 'Japan',        year: '—', vibe: 'Cities' },
-  { code: 'th', iso: 'TH', name: 'Thailand',     year: '—', vibe: 'Jungle' },
-  { code: 'au', iso: 'AU', name: 'Australia',    year: '—', vibe: 'Islands' },
-  { code: 'id', iso: 'ID', name: 'Indonesia',    year: '—', vibe: 'Islands' },
-  { code: 'gb', iso: 'GB', name: 'England',      year: '—', vibe: 'Cities' },          // simple-world-map: GB is one shape
-  { code: 'gb-sct', iso: 'GB', name: 'Scotland', year: '—', vibe: 'Cities', alias: 'gb' }, // share GB shape; not double-rendered
-  { code: 'ie', iso: 'IE', name: 'Ireland',      year: '—', vibe: 'Cities' },
-  { code: 'pt', iso: 'PT', name: 'Portugal',     year: '—', vibe: 'Coast' },
-  { code: 'es', iso: 'ES', name: 'Spain',        year: '—', vibe: 'Coast' },
-  { code: 'it', iso: 'IT', name: 'Italy',        year: '—', vibe: 'Roadtrip' },
-  { code: 'ch', iso: 'CH', name: 'Switzerland',  year: '—', vibe: 'Mountains' },
-  { code: 'at', iso: 'AT', name: 'Austria',      year: '—', vibe: 'Mountains' },
-  { code: 'de', iso: 'DE', name: 'Germany',      year: '—', vibe: 'Cities' },
-  { code: 'dk', iso: 'DK', name: 'Denmark',      year: '—', vibe: 'Roadtrip' },
-  { code: 'nl', iso: 'NL', name: 'Netherlands',  year: '—', vibe: 'Cities' },
-  { code: 'fr', iso: 'FR', name: 'France',       year: '—', vibe: 'Cities' },
-  { code: 'hr', iso: 'HR', name: 'Croatia',      year: '—', vibe: 'Coast' },
-  { code: 'gr', iso: 'GR', name: 'Greece',       year: '—', vibe: 'Coast' },
-  { code: 'tr', iso: 'TR', name: 'Turkey',       year: '—', vibe: 'Roadtrip' },
-  { code: 'cz', iso: 'CZ', name: 'Czechia',      year: '—', vibe: 'Cities' },
-  { code: 'pl', iso: 'PL', name: 'Poland',       year: '—', vibe: 'Cities' },
-  { code: 'hu', iso: 'HU', name: 'Hungary',      year: '—', vibe: 'Cities' },
-  { code: 'si', iso: 'SI', name: 'Slovenia',     year: '—', vibe: 'Mountains' },
-  { code: 'me', iso: 'ME', name: 'Montenegro',   year: '—', vibe: 'Mountains' }
+  { code: 'ca',     iso: 'CA', name: 'Canada',              folder: 'canada',       tripType: 'MANY TRIPS',                paragraphs: ["Mom and cousins lived here, so it became the country I returned to most without ever really planning to. Vancouver for work, Toronto for family, Quebec City for dog sledding through a town that felt three centuries removed from the rest of the continent."] },
+  { code: 'mx',     iso: 'MX', name: 'Mexico',              folder: 'mexico',       tripType: 'MANY TRIPS',                paragraphs: ["Weddings in Puerto Vallarta, bachelor parties in Cabo, cenotes in the Yucatan.", "The one that stuck: Thanksgiving in Mexico City, ducking between speakeasies and watching lucha libre matches with friends."] },
+  { code: 'cr',     iso: 'CR', name: 'Costa Rica',          folder: 'costa-rica',   tripType: 'FAMILY',                    paragraphs: ["Visiting mom at the villa she bought deep in the jungle. Howler monkeys showed up for breakfast every morning. Waterfall hikes in the afternoon."] },
+  { code: 'bs',     iso: 'BS', name: 'Bahamas',             folder: 'bahamas',      tripType: 'SPRING BREAK',              paragraphs: ["First trip abroad on my own. College spring break, tequila shots, reggaeton until sunrise. Nothing deeper than that, and that was the point."] },
+  { code: 'co',     iso: 'CO', name: 'Colombia',            folder: 'colombia',     tripType: 'BACHELOR PARTY',            paragraphs: ["Bachelor party with a group of friends from every era of my life finally in one place. Cocktails on the old fortress walls of Cartagena while the sun dropped into the Caribbean."] },
+  { code: 'ar',     iso: 'AR', name: 'Argentina',           folder: 'argentina',    tripType: 'PATAGONIA + WORLD CUP',     paragraphs: ["Three weeks hiking El Chalten and Torres del Paine, all the way down to the glaciers at the southern tip.", "Caught the entire Argentina World Cup run while we were there -- ended up in Buenos Aires the night they won it. The streets did not sleep."] },
+  { code: 'tz',     iso: 'TZ', name: 'Tanzania',            folder: 'tanzania',     tripType: 'SAFARI',                    paragraphs: ["Serengeti safari during the Great Migration. Lions, elephants, wild dogs, leopards draped over tree branches. The hotel had its own private watering hole; the animals came to us."] },
+  { code: 'eg',     iso: 'EG', name: 'Egypt',               folder: 'egypt',        tripType: 'ANCIENT HISTORY',           paragraphs: ["Crawled inside the Great Pyramid. Stood in King Tut's tomb in the Valley of the Kings.", "Took a hot air balloon over the desert at sunrise, then ended the trip floating in the Red Sea at Sharm El Sheikh."] },
+  { code: 'ae',     iso: 'AE', name: 'United Arab Emirates',folder: 'uae',          tripType: 'CONTRADICTIONS',            paragraphs: ["Dune buggies through the desert in the morning, snowboarding inside a mall in the afternoon. The world's tallest tower for dinner.", "The whole country runs on cognitive dissonance and it's fascinating."] },
+  { code: 'il',     iso: 'IL', name: 'Israel',              folder: 'israel',       tripType: 'RIGHT BEFORE',              paragraphs: ["Went weeks before October 7th. Massive protests in the streets, Jerusalem's old city, food I still think about, and an afternoon floating in the Dead Sea.", "A different country now than the one I saw."] },
+  { code: 'in',     iso: 'IN', name: 'India',               folder: 'india',        tripType: 'WEDDING IN KERALA',         paragraphs: ["Three-day wedding for my friend Taylor in Kerala. Danced from sunrise to sundown, then did it again the next day. The closest I've come to losing track of what day it was."] },
+  { code: 'jp',     iso: 'JP', name: 'Japan',               folder: 'japan',        tripType: 'TOKYO + KYOTO',             paragraphs: ["Imperial palaces, pagodas, the Kyoto bamboo forest, twenty-course omakase.", "The night I remember best: drinking whiskey out of a jar with a viper in it at a Golden Gai bar with strangers who didn't speak English."] },
+  { code: 'th',     iso: 'TH', name: 'Thailand',            folder: 'thailand',     tripType: 'BANGKOK + PHUKET',          paragraphs: ["James Bond Island by longboat. New Year's Eve in Bangkok singing karaoke with locals.", "Got pulled into an amateur boxing match in a crowded bar in Phuket. I don't recommend it. I don't regret it."] },
+  { code: 'au',     iso: 'AU', name: 'Australia',           folder: 'australia',    tripType: 'REEF + CITIES',             paragraphs: ["Swam the Great Barrier Reef on a Whitsundays sailing trip. Walked Sydney end to end. Ate kangaroo on the Gold Coast -- gamier than expected, leaner than expected."] },
+  { code: 'id',     iso: 'ID', name: 'Indonesia',           folder: 'indonesia',    tripType: 'BALI',                      paragraphs: ["Sunrise hike up an active volcano. Monkey Forest. An ancient Buddhist water temple.", "Multiple near-death moments threading mopeds through Ubud traffic -- the kind of trip where the highlight reel and the close-call reel are the same reel."] },
+  { code: 'gb',     iso: 'GB', name: 'England',             folder: 'england',      tripType: 'COUSINS + COTSWOLDS',       paragraphs: ["Visiting cousins during Pride week in London. The Tower, Churchill's war bunker, then out to the Cotswolds for my cofounder Ben's wedding.", "Two very different versions of England in one trip."] },
+  { code: 'gb-sct', iso: 'GB', name: 'Scotland',            folder: 'scotland',     tripType: 'HIGHLANDS',                 paragraphs: ["Nights out in Edinburgh, then north into the Highlands for hikes that looked like Highlander location scouts had been there first. Went to the Loch Ness museum unironically."], alias: 'gb' },
+  { code: 'ie',     iso: 'IE', name: 'Ireland',             folder: 'ireland',      tripType: 'RING OF KERRY',             paragraphs: ["Drove the Ring of Kerry with cousins. Kissed the Blarney Stone, toured a haunted castle, ended every day at the world's oldest pub.", "The Guinness museum was better than it had any right to be."] },
+  { code: 'pt',     iso: 'PT', name: 'Portugal',            folder: 'portugal',     tripType: 'LAGOS + LISBON',            paragraphs: ["Dinners cooked by chefs in tiny Lagos kitchens. A hostel crew adopted me in Lisbon and we ended up in a club until 5am.", "Drove out to Cabo da Roca -- the edge of the old world, where Europeans once thought the map ended."] },
+  { code: 'es',     iso: 'ES', name: 'Spain',               folder: 'spain',        tripType: 'MADRID + BARCELONA + RONDA',paragraphs: ["Watched Neymar score a hat trick at Camp Nou. Beach clubs in Barcelona, a few days in Madrid, then out to Ronda for my friend Lauren's wedding on a clifftop that didn't feel real."] },
+  { code: 'it',     iso: 'IT', name: 'Italy',               folder: 'italy',        tripType: 'WEDDING TOUR',              paragraphs: ["Hiking the Dolomites, hairpin turns down the Amalfi Coast, ash still visible at Pompeii.", "The trip's anchor: an authentic Italian wedding near Lake Como for my cousin. Five hours of dinner. Nobody complained."] },
+  { code: 'ch',     iso: 'CH', name: 'Switzerland',         folder: 'switzerland',  tripType: 'INTERLAKEN + ZURICH',       paragraphs: ["Bungee jumped out of a cable car over Interlaken. Took the train up to the Jungfrau observatory the next morning. Beer gardens and lake-edge pools in Zurich to recover."] },
+  { code: 'at',     iso: 'AT', name: 'Austria',             folder: 'austria',      tripType: 'INNSBRUCK',                 paragraphs: ["A long walk along the river in Innsbruck and as much schnitzel and sausage as one person can responsibly eat. Sometimes a trip is just that."] },
+  { code: 'de',     iso: 'DE', name: 'Germany',             folder: 'germany',      tripType: 'EVERYTHING GERMANY HAS',    paragraphs: ["Oktoberfest in full lederhosen on carnival rides. The world's largest indoor biodome. An abandoned Soviet theme park.", "WWII museums in Berlin during the day, industrial raves in the east until morning. No country gave me a wider range in a single visit."] },
+  { code: 'dk',     iso: 'DK', name: 'Denmark',             folder: 'denmark',      tripType: 'COPENHAGEN',                paragraphs: ["Biked everywhere, ate everything. Wandered into Christiania, the anarchist commune in the middle of the city.", "Caught a Denmark World Cup match in the home stadium -- the crowd ran the country for ninety minutes."] },
+  { code: 'nl',     iso: 'NL', name: 'Netherlands',         folder: 'netherlands',  tripType: 'AMSTERDAM',                 paragraphs: ["Boat rides through the canals, the Van Gogh museum, the Heineken brewery.", "The red light district at night and coffee shops in the morning -- a city that is exactly as advertised, and somehow still surprising."] },
+  { code: 'fr',     iso: 'FR', name: 'France',              folder: 'france',       tripType: 'NICE + PARIS + CHAMPAGNE',  paragraphs: ["Beach clubs on the Cote d'Azur, kayaking the river gorges in Provence, then Paris for the Eiffel Tower, the Louvre, and the catacombs.", "Ended in Champagne country touring the cellars that supply half the world's celebrations."] },
+  { code: 'hr',     iso: 'HR', name: 'Croatia',             folder: 'croatia',      tripType: 'HVAR + DUBROVNIK',          paragraphs: ["Day clubs in Hvar that don't quit until the sun's well up. In Dubrovnik, found a clifftop bar where the move was a beer and a jump straight into the Adriatic."] },
+  { code: 'gr',     iso: 'GR', name: 'Greece',              folder: 'greece',       tripType: 'MAINLAND',                  paragraphs: ["Ten friends, one summer home, no real itinerary. Beach clubs in Thassos. The kind of trip where the group is the whole point and the country is the excuse."] },
+  { code: 'tr',     iso: 'TR', name: 'Turkey',              folder: 'turkey',       tripType: 'ISTANBUL + CAPPADOCIA',     paragraphs: ["Mosques in Istanbul, cave hotels in Cappadocia, then up in a hot air balloon at sunrise over the valleys.", "Ended in Bodrum at the beach clubs. A country that gives you three different vacations stitched together."] },
+  { code: 'cz',     iso: 'CZ', name: 'Czechia',             folder: 'czechia',      tripType: 'PRAGUE',                    paragraphs: ["Notes coming soon."] },
+  { code: 'pl',     iso: 'PL', name: 'Poland',              folder: 'poland',       tripType: 'KRAKOW',                    paragraphs: ["Notes coming soon."] },
+  { code: 'hu',     iso: 'HU', name: 'Hungary',             folder: 'hungary',      tripType: 'BUDAPEST',                  paragraphs: ["Notes coming soon."] },
+  { code: 'si',     iso: 'SI', name: 'Slovenia',            folder: 'slovenia',     tripType: 'LJUBLJANA',                 paragraphs: ["Notes coming soon."] },
+  { code: 'me',     iso: 'ME', name: 'Montenegro',          folder: 'montenegro',   tripType: 'KOTOR',                     paragraphs: ["Notes coming soon."] }
 ];
 
 // Country writeup lookup
@@ -863,25 +875,6 @@ const WORLD_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500
     }
   });
 
-  // HOME BASE label at USA centroid
-  const usPath = svg.querySelector(`path[id="${HOME_ISO}"]`);
-  if (usPath) {
-    try {
-      const bbox = usPath.getBBox();
-      const cx = bbox.x + bbox.width * 0.42;
-      const cy = bbox.y + bbox.height * 0.55;
-      const NS = 'http://www.w3.org/2000/svg';
-      const text = document.createElementNS(NS, 'text');
-      text.setAttribute('x', cx);
-      text.setAttribute('y', cy);
-      text.setAttribute('text-anchor', 'middle');
-      text.setAttribute('dominant-baseline', 'middle');
-      text.setAttribute('fill', 'var(--accent)');
-      text.setAttribute('style', "font-family: 'JetBrains Mono', monospace; font-size: 7px; font-weight: 500; letter-spacing: 0.18em; pointer-events: none;");
-      text.textContent = 'HOME BASE';
-      svg.appendChild(text);
-    } catch (_) {}
-  }
 
   // Tap-target overlays for very small countries
   const TINY = ['SI','ME'];
@@ -927,16 +920,18 @@ let sheetOpen = false;
 
 function renderSheet(country) {
   sheetTitle.innerHTML = `${country.name}<span class="period">.</span>`;
-  sheetMeta.innerHTML = `${country.year} <span class="sep">·</span> ${country.vibe}`;
-  sheetWriteup.innerHTML = `
-    <p>[ Placeholder writeup — Chase will replace with real travel notes. Two short paragraphs about the trip, what stuck, what surprised. ]</p>
-    <p>[ Second paragraph placeholder — the small detail that made the trip stick. ]</p>
-  `;
+  sheetMeta.innerHTML = `${country.tripType || ''}`;
+  sheetWriteup.innerHTML = (country.paragraphs || []).map(p => `<p>${p}</p>`).join('');
   sheetPhotos.innerHTML = '';
+  const folder = country.folder || country.name.toLowerCase().replace(/\s+/g, '-');
   for (let i = 1; i <= 4; i++) {
     const cell = document.createElement('div');
     cell.className = 'photo-cell';
-    cell.textContent = `[ PHOTO ${i} ]`;
+    const img = document.createElement('img');
+    img.src = `assets/countries/${folder}/photo-${i}.jpg`;
+    img.alt = `${country.name} photo ${i}`;
+    img.onerror = function() { this.parentNode.classList.add('photo-missing'); this.remove(); };
+    cell.appendChild(img);
     sheetPhotos.appendChild(cell);
   }
 }
