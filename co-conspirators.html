@@ -1,0 +1,868 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Co-conspirators · Chase Croft</title>
+<meta name="description" content="People I've built alongside — designers, engineers, PMs, and operators who can tell you what it's actually like to work with me.">
+<meta name="robots" content="noindex,nofollow">
+<meta property="og:title" content="Co-conspirators · Chase Croft">
+<meta property="og:description" content="People I've built alongside.">
+<meta property="og:image" content="https://chasecroft.com/assets/og-image.jpg">
+<meta property="og:url" content="https://chasecroft.com/co-conspirators">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Chase Croft">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="/assets/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,900;1,9..144,400;1,9..144,900&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0A0A0B; --ink: #E8E6E1; --ink-dim: rgba(232,230,225,0.55);
+    --ink-faint: rgba(232,230,225,0.32); --accent: #FF6B47;
+    --rule: rgba(232,230,225,0.10); --card: rgba(232,230,225,0.025);
+    --card-border: rgba(232,230,225,0.10); --card-border-hover: rgba(232,230,225,0.18);
+    --chip: rgba(232,230,225,0.06); --chip-ink: rgba(232,230,225,0.62);
+  }
+  html[data-theme="light"] {
+    --bg: #F4F1EA; --ink: #1A1A1C; --ink-dim: rgba(26,26,28,0.58);
+    --ink-faint: rgba(26,26,28,0.35); --accent: #FF6B47;
+    --rule: rgba(26,26,28,0.10); --card: rgba(26,26,28,0.015);
+    --card-border: rgba(26,26,28,0.12); --card-border-hover: rgba(26,26,28,0.22);
+    --chip: rgba(26,26,28,0.05); --chip-ink: rgba(26,26,28,0.62);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--bg); color: var(--ink); }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 17px; line-height: 1.55; font-weight: 400;
+    -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+    overflow-x: hidden; transition: background-color 400ms ease, color 400ms ease;
+  }
+  ::selection { background: var(--accent); color: #fff; }
+  a { color: inherit; }
+
+  /* ---------- Layout ---------- */
+  .wrap { max-width: 1280px; margin: 0 auto; padding: 0 6vw 0 calc(6vw + 56px); position: relative; z-index: 2; }
+  @media (max-width: 820px) { .wrap { padding: 0 6vw; } }
+  section { padding: 12vh 0 6vh; position: relative; }
+  section:first-of-type { padding-top: 0; }
+
+  /* ---------- Type ---------- */
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; font-weight: 500; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--ink-dim);
+    display: inline-flex; align-items: center; gap: 10px;
+  }
+  .eyebrow::before {
+    content: ""; display: inline-block;
+    width: 8px; height: 8px;
+    background: var(--accent); transform: translateY(-1px);
+  }
+  .eyebrow .idx { color: var(--accent); }
+  .eyebrow .sep { color: var(--ink-faint); margin: 0 2px; }
+  .section-title {
+    font-family: 'Fraunces', serif; font-weight: 900;
+    letter-spacing: -0.025em; line-height: 1;
+    font-size: clamp(2.25rem, 4.2vw, 3.5rem);
+    margin-top: 2.4vh; margin-bottom: 2.2vh;
+    text-wrap: balance; font-variation-settings: "opsz" 144;
+  }
+  .section-title em { font-style: italic; font-weight: 900; }
+
+  /* ---------- Nav ---------- */
+  .stamp {
+    position: fixed; top: 22px; left: 24px; z-index: 60;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--ink-dim); text-decoration: none;
+    display: inline-flex; align-items: center; gap: 8px;
+    transition: color 200ms ease;
+  }
+  .stamp:hover { color: var(--accent); }
+  .stamp .arrow { transition: transform 180ms ease; display: inline-block; }
+  .stamp:hover .arrow { transform: translateX(-3px); }
+  .toggle {
+    position: fixed; top: 22px; right: 24px; z-index: 60;
+    background: transparent; border: none; padding: 4px 0;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--ink-dim); cursor: pointer; transition: color 200ms ease;
+  }
+  .toggle:hover { color: var(--accent); }
+
+  /* ---------- Left rail ---------- */
+  .rail {
+    position: fixed; left: max(24px, 3.2vw); top: 0; bottom: 0;
+    width: 28px; z-index: 3; pointer-events: none;
+  }
+  .rail svg { width: 100%; height: 100%; display: block; overflow: visible; }
+  .rail-line { stroke: var(--rule); stroke-width: 1; fill: none; }
+  .rail-dot {
+    fill: var(--accent);
+    filter: drop-shadow(0 0 4px rgba(255,107,71,0.7)) drop-shadow(0 0 10px rgba(255,107,71,0.45));
+    transition: opacity 250ms ease;
+  }
+  .rail-pin .ring { fill: var(--bg); stroke: var(--ink-faint); stroke-width: 1.25; transition: stroke 350ms ease, fill 350ms ease; }
+  .rail-pin .dot { fill: var(--accent); opacity: 0; transform: scale(0.4); transform-origin: center; transition: opacity 350ms ease, transform 350ms cubic-bezier(.2,1.4,.4,1); }
+  .rail-pin .label { font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 500; fill: var(--ink-faint); letter-spacing: 0.14em; text-transform: uppercase; transition: fill 350ms ease; }
+  .rail-pin.lit .ring { stroke: var(--accent); }
+  .rail-pin.lit .dot { opacity: 1; transform: scale(1); }
+  .rail-pin.lit .label { fill: var(--accent); }
+  @media (max-width: 820px) { .rail { display: none; } }
+
+  /* ---------- Hero ---------- */
+  .hero { min-height: 92vh; display: flex; flex-direction: column; justify-content: center; padding: 16vh 0 10vh; }
+  .hero .eyebrow { margin-bottom: 4vh; }
+  .hero h1 {
+    font-family: 'Fraunces', serif; font-weight: 900;
+    font-size: clamp(3.5rem, 10vw, 8.5rem);
+    line-height: 0.92; letter-spacing: -0.045em; margin-left: -0.04em;
+    font-variation-settings: "opsz" 144; text-wrap: balance; max-width: 14ch;
+  }
+  .hero h1 em { font-style: italic; font-weight: 400; color: var(--accent); font-variation-settings: "opsz" 144; }
+  .hero .subhead {
+    margin-top: 4vh; font-size: clamp(1.15rem, 1.5vw, 1.4rem);
+    line-height: 1.55; max-width: 58ch; color: var(--ink); text-wrap: pretty;
+  }
+  .hero .subhead .quiet { color: var(--ink-dim); }
+  .hero .coords {
+    margin-top: 7vh;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--ink-faint); letter-spacing: 0.16em; text-transform: uppercase;
+    display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center;
+  }
+  .hero .coords .dash { color: var(--accent); }
+  .hero .coords .pipe { color: var(--ink-faint); opacity: 0.5; }
+
+  /* ---------- Section grid ---------- */
+  .section-head { margin-bottom: 6vh; max-width: 64ch; }
+  .testi-grid {
+    display: grid; grid-template-columns: 5fr 4fr 3fr;
+    column-gap: 24px; align-items: start;
+  }
+  .testi-grid.flipped { grid-template-columns: 3fr 4fr 5fr; }
+  .testi-col { display: flex; flex-direction: column; gap: 28px; min-width: 0; }
+  .anchor-col { grid-column: 1; }
+  .mid-col    { grid-column: 2; }
+  .narrow-col { grid-column: 3; margin-top: 5vh; }
+  .testi-grid.flipped .anchor-col { grid-column: 3; }
+  .testi-grid.flipped .mid-col    { grid-column: 2; }
+  .testi-grid.flipped .narrow-col { grid-column: 1; }
+
+  @media (max-width: 1080px) {
+    .testi-grid, .testi-grid.flipped {
+      grid-template-columns: 1fr 1fr; column-gap: 22px; row-gap: 28px;
+    }
+    .anchor-col, .testi-grid.flipped .anchor-col { grid-column: 1 / -1; }
+    .mid-col, .narrow-col,
+    .testi-grid.flipped .mid-col, .testi-grid.flipped .narrow-col {
+      grid-column: auto; margin-top: 0;
+    }
+  }
+  @media (max-width: 720px) {
+    .testi-grid, .testi-grid.flipped { grid-template-columns: 1fr; }
+    .anchor-col, .mid-col, .narrow-col,
+    .testi-grid.flipped .anchor-col, .testi-grid.flipped .mid-col, .testi-grid.flipped .narrow-col {
+      grid-column: 1; margin-top: 0;
+    }
+    .testi-card { padding: 24px 22px 22px; }
+  }
+
+  /* ---------- Testimonial cards ---------- */
+  .testi-card {
+    background: var(--card); border: 1px solid var(--card-border); border-radius: 4px;
+    padding: 28px 30px 26px; transition: border-color 300ms ease, background 300ms ease;
+    display: flex; flex-direction: column; gap: 22px;
+  }
+  .testi-card:hover { border-color: var(--card-border-hover); }
+  .testi-quote { font-size: 15px; line-height: 1.65; color: var(--ink); text-wrap: pretty; flex: 1; }
+  .testi-quote p + p { margin-top: 0.9em; }
+  .testi-card.anchor .testi-quote { font-size: 15.5px; }
+  .testi-quote::before {
+    content: ""; display: block; width: 18px; height: 2px;
+    background: var(--accent); margin-bottom: 18px; opacity: 0.95;
+  }
+  .testi-attr {
+    display: flex; align-items: center; gap: 14px;
+    padding-top: 18px; border-top: 1px solid var(--rule);
+  }
+  .avatar {
+    flex: 0 0 auto; width: 40px; height: 40px; border-radius: 999px;
+    background: var(--chip); border: 1px solid var(--card-border);
+    display: grid; place-items: center;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--chip-ink); letter-spacing: 0.04em;
+    overflow: hidden; position: relative;
+  }
+  .avatar img { width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(45%) contrast(1.02); }
+  .who { flex: 1 1 auto; min-width: 0; }
+  .who .name { font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; color: var(--ink); letter-spacing: -0.005em; line-height: 1.25; }
+  .who .role { font-family: 'Inter', sans-serif; font-weight: 400; font-size: 13px; color: var(--ink-dim); line-height: 1.35; margin-top: 2px; }
+  .who .role .at { color: var(--ink-faint); }
+  .logos { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+  .logos .chip {
+    width: 26px; height: 26px; border-radius: 4px;
+    background: var(--chip); border: 1px solid var(--card-border);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 500;
+    color: var(--chip-ink); letter-spacing: 0.04em; text-transform: uppercase;
+    line-height: 1; overflow: hidden; flex-shrink: 0;
+  }
+  .logos .chip img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  /* ---------- Endcap ---------- */
+  .endcap { padding: 14vh 0 12vh; }
+  .endcap .eyebrow { margin-bottom: 4vh; }
+  .endcap .line {
+    font-family: 'Fraunces', serif; font-weight: 400; font-style: italic;
+    font-size: clamp(1.5rem, 2.4vw, 2.1rem); line-height: 1.3; color: var(--ink);
+    max-width: 32ch; margin-bottom: 4vh; text-wrap: balance;
+  }
+  .endcap .mailto {
+    font-family: 'JetBrains Mono', monospace; font-size: 14px;
+    letter-spacing: 0.04em; color: var(--accent); text-decoration: none;
+    border-bottom: 1px solid var(--accent); padding-bottom: 2px;
+    transition: opacity 200ms ease;
+  }
+  .endcap .mailto:hover { opacity: 0.75; }
+
+  /* ---------- File bar ---------- */
+  .filebar {
+    border-top: 1px solid var(--rule); padding: 22px 6vw 22px calc(6vw + 56px);
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 16px; flex-wrap: wrap;
+    font-family: 'JetBrains Mono', monospace; font-size: 10.5px;
+    color: var(--ink-faint); letter-spacing: 0.14em; text-transform: uppercase;
+  }
+  @media (max-width: 820px) { .filebar { padding: 22px 6vw; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+    .rail-pin .dot { opacity: 1 !important; transform: scale(1) !important; }
+    .rail-pin .ring { stroke: var(--accent) !important; }
+    .rail-dot { opacity: 0 !important; }
+  }
+</style>
+</head>
+<body>
+
+<a class="stamp" href="/"><span class="arrow">←</span> Back to trailhead</a>
+<button class="toggle" id="themeToggle" aria-label="Toggle color theme"><span id="themeLabel">DARK</span></button>
+
+<!-- Left rail -->
+<div class="rail" id="rail" aria-hidden="true">
+  <svg id="railSvg" viewBox="0 0 28 1000" preserveAspectRatio="none">
+    <line class="rail-line" x1="14" y1="0" x2="14" y2="1000"></line>
+    <g id="railPins"></g>
+    <circle class="rail-dot" id="railDot" cx="14" cy="0" r="3.5" style="opacity:0"></circle>
+  </svg>
+</div>
+
+<!-- 00 Hero -->
+<section class="hero" data-section-pin="00" data-screen-label="00 Trailhead">
+  <div class="wrap">
+    <div class="eyebrow">Off the main trail</div>
+    <h1>Co-<em>conspirators</em>.</h1>
+    <p class="subhead">
+      People I've built alongside.
+      <span class="quiet">This page isn't linked from the main site — if you're here, I sent you. Below are the folks I'd point you to if you wanted to ask anyone what it's actually like to work with me.</span>
+    </p>
+    <div class="coords">
+      <span class="dash">▪</span>
+      <span>Coordinates</span>
+      <span class="pipe">·</span>
+      <span>Shared via direct link</span>
+      <span class="pipe">·</span>
+      <span>Last updated <span id="lastUpdated">May 2026</span></span>
+    </div>
+  </div>
+</section>
+
+<!-- 01 Design -->
+<section data-section-pin="01" data-section-label="Design" data-screen-label="01 Design">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow"><span class="idx">01</span><span class="sep">—</span><span>Design</span></div>
+      <h2 class="section-title">On taste, collaboration, and pushing for the right <em>level of fidelity</em>.</h2>
+    </div>
+
+    <div class="testi-grid">
+
+      <div class="testi-col anchor-col">
+        <article class="testi">
+          <div class="testi-card anchor">
+            <div class="testi-quote">
+              <p>I worked with Chase at Tally as both a cross-functional partner and peer when I changed roles from product designer to product manager for an interim position.</p>
+              <p>Chase was an excellent PM to work with as a designer and as a fellow PM. He is incredibly process-oriented and outcome driven, helping the team drive the most effective and impactful solutions. He is also a strong team leader, and knows when to protect the time of his team vs. push the team to explore new innovative opportunities.</p>
+              <p>On the design side, Chase also is a strong collaborator and brings a deep design sense to his work. He is able to explore ideas and present possible directions at the right level of fidelity to support design, but still allow design the right amount of creative space to iterate and determine the best final solution.</p>
+              <p>In my interim PM role, Chase also showed grace, empathy, and mentorship (and a great sense of humor). Anyone would be lucky to have him on their team.</p>
+            </div>
+            <div class="testi-attr">
+              <div class="avatar">
+                <img src="/assets/co-conspirators/avatars/caitlin-brisson.jpg" alt="Caitlin Brisson" onerror="this.style.display='none'">
+                CB
+              </div>
+              <div class="who">
+                <div class="name">Caitlin Brisson</div>
+                <div class="role">Senior Product Designer <span class="at">@</span> Tally</div>
+              </div>
+              <div class="logos">
+                <span class="chip" title="Duolingo"><img src="/assets/co-conspirators/logos/duolingo.png" alt="Duolingo" onerror="this.style.display='none'">DUO</span>
+                <span class="chip" title="Gusto"><img src="/assets/co-conspirators/logos/gusto.png" alt="Gusto" onerror="this.style.display='none'">GST</span>
+                <span class="chip" title="Tally"><img src="/assets/co-conspirators/logos/tally.png" alt="Tally" onerror="this.style.display='none'">TLY</span>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div class="testi-col mid-col">
+        <article class="testi">
+          <div class="testi-card">
+            <div class="testi-quote">
+              <p>Chase is one of the best product managers I've ever had the pleasure of working with. He's considerate, thorough, and knows how to incorporate design and engineering expertly. His understanding of what makes a great product, and how to produce it intelligently, has made working with Chase one of my favorite experiences as a product designer.</p>
+            </div>
+            <div class="testi-attr">
+              <div class="avatar">
+                <img src="/assets/co-conspirators/avatars/caleb-andrews.jpg" alt="Caleb Andrews" onerror="this.style.display='none'">
+                CA
+              </div>
+              <div class="who">
+                <div class="name">Caleb Andrews</div>
+                <div class="role">Staff Product Designer <span class="at">@</span> Tally</div>
+              </div>
+              <div class="logos">
+                <span class="chip" title="Mailchimp"><img src="/assets/co-conspirators/logos/mailchimp.png" alt="Mailchimp" onerror="this.style.display='none'">MC</span>
+                <span class="chip" title="Tally"><img src="/assets/co-conspirators/logos/tally.png" alt="Tally" onerror="this.style.display='none'">TLY</span>
+              </div>
+            </div>
+          </div>
+        </article>
+        <article class="testi">
+          <div class="testi-card">
+            <div class="testi-quote">
+              <p>Chase has exceptional collaboration skills. He has been an effective PM partner for me as a product designer, for multiple occasions from co-hosting design thinking workshops with cross-functional partners to analyzing problems together and brainstorming solutions. He handles ambiguous situations well; his ability to context switch and work on multiple types of problems has helped us move ahead faster. I'd love a chance to work with him again.</p>
+            </div>
+            <div class="testi-attr">
+              <div class="avatar">
+                <img src="/assets/co-conspirators/avatars/veda-bankar.jpg" alt="Veda Bankar" onerror="this.style.display='none'">
+                VB
+              </div>
+              <div class="who">
+                <div class="name">Veda Bankar</div>
+                <div class="role">Senior Product Designer <span class="at">@</span> Tally</div>
+              </div>
+              <div class="logos">
+                <span class="chip" title="Meta"><img src="/assets/co-conspirators/logos/meta.png" alt="Meta" onerror="this.style.display='none'">MTA</span>
+                <span class="chip" title="Hinge"><img src="/assets/co-conspirators/logos/hinge.png" alt="Hinge" onerror="this.style.display='none'">HNG</span>
+                <span class="chip" title="Tally"><img src="/assets/co-conspirators/logos/tally.png" alt="Tally" onerror="this.style.display='none'">TLY</span>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div class="testi-col narrow-col">
+        <article class="testi">
+          <div class="testi-card">
+            <div class="testi-quote">
+              <p>It was a pleasure working with Chase — he understands the importance of good design at early stages of the product process. As CEO of Mischief, he always took a hands-on approach when we needed his opinion while still entrusting us with the autonomy to do our jobs well. He's a team player that will never ask you to put in long hours without doing the same himself.</p>
+            </div>
+            <div class="testi-attr">
+              <div class="avatar">
+                <img src="/assets/co-conspirators/avatars/eric-gandhi.jpg" alt="Eric Gandhi" onerror="this.style.display='none'">
+                EG
+              </div>
+              <div class="who">
+                <div class="name">Eric Gandhi</div>
+                <div class="role">Head of Design <span class="at">@</span> Mischief</div>
+              </div>
+              <div class="logos">
+                <span class="chip" title="Slack"><img src="/assets/co-conspirators/logos/slack.png" alt="Slack" onerror="this.style.display='none'">SLK</span>
+                <span class="chip" title="Disney"><img src="/assets/co-conspirators/logos/disney.png" alt="Disney" onerror="this.style.display='none'">DIS</span>
+                <span class="chip" title="eBay"><img src="/assets/co-conspirators/logos/ebay.png" alt="eBay" onerror="this.style.display='none'">EBY</span>
+              </div>
+            </div>
+          </div>
+        </article>
+        <article class="testi">
+          <div class="testi-card">
+            <div class="testi-quote">
+              <p>Chase is one of the best product managers I've ever had the pleasure of working with. He's considerate, thorough, and knows how to incorporate design and engineering expertly. Working with Chase has been one of my favorite experiences as a product designer.</p>
+            </div>
+            <div class="testi-attr">
+              <div class="avatar">
+                <img src="/assets/co-conspirators/avatars/walter-somerville.jpg" alt="Walter Somerville" onerror="this.style.display='none'">
+                WS
+              </div>
+              <div class="who">
+                <div class="name">Walter Somerville</div>
+                <div class="role">Senior Product Designer <span class="at">@</span> Dropbox</div>
+              </div>
+              <div class="logos">
+                <span class="chip" title="Postmark"><img src="/assets/co-conspirators/logos/postmark.png" alt="Postmark" onerror="this.style.display='none'">PMK</span>
+                <span class="chip" title="Dropbox"><img src="/assets/co-conspirators/logos/dropbox.png" alt="Dropbox" onerror="this.style.display='none'">DBX</span>
+                <span class="chip" title="Walmart"><img src="/assets/co-conspirators/logos/walmart.png" alt="Walmart" onerror="this.style.display='none'">WMT</span>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- 02 Product Management -->
+<section data-section-pin="02" data-section-label="PM" data-screen-label="02 Product Management">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow"><span class="idx">02</span><span class="sep">—</span><span>Product Management</span></div>
+      <h2 class="section-title">On <em>process</em>, outcomes, and protecting the team.</h2>
+    </div>
+
+    <div class="testi-grid flipped">
+
+      <div class="testi-col anchor-col">
+        <article class="testi">
+          <div class="testi-card anchor">
+            <div class="testi-quote">
+              <p>Chase is the rare breed of product manager that has both business acumen and technical expertise. His diverse skill set helps him quickly earn the respect of engineers and product managers alike.</p>
+              <p>During his tenure as the Product Lead for the Market Intelligence team, Chase leveraged the experience he acquired as a category manager to define a business-driven roadmap that reflected the needs of his users. The Market Intelligence platform has a reputation for being highly technical and difficult for business users to understand. Chase spearheaded an initiative to train stakeholders on the platform and brought transparency to a challenging system.</p>
+              <p>I greatly enjoyed working with Chase because he is a clear communicator, positive team player, and creative problem solver. We collaborated on a successful data ingestion project that required many iterations — Chase made the process painless by providing timely updates, and he found ways to pivot in the face of unforeseen obstacles.</p>
+            </div>
+            <div class="testi-attr">
+              <div class="avatar">
+                <img src="/assets/co-conspirators/avatars/joyce-wu.jpg" alt="Joyce Wu" onerror="this.style.display='none'">
+                JW
+              </div>
+              <div class="who">
+                <div class="name">Joyce Wu</div>
+                <div class="role">Senior Product Manager <span class="at">@</span> Jet</div>
+              </div>
+              <div class="logos">
+                <span class="chip" title="Pinterest"><img src="/assets/co-conspirators/logos/pinterest.png" alt="Pinterest" onerror="this.style.display='none'">PIN</span>
+                <span class="chip" title="Meta"><img src="/assets/co-conspirators/logos/meta.png" alt="Meta" onerror="this.style.display='none'">MTA</span>
+                <span class="chip" title="Jet"><img src="/assets/co-conspirators/logos/jet.png" alt="Jet" onerror="this.style.display='none'">JET</span>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div class="testi-col mid-col">
+        <article class="testi">
+          <div class="testi-card">
+            <div class="testi-quote">
+              <p>Chase is a stellar PM. He gracefully managed multiple stakeholders, effectively prioritizing development on a crucial part of Jet's technology. He maintained a roadmap with razor-sharp focus, critical for the shared-service nature of his product, and was always able to elegantly summarize his decisions. A fast learner — Chase was quick to grasp the technical details of Jet's competitive intelligence platform and understood the tradeoffs inherent in product decisions involving a highly distributed, microservice-oriented architecture.</p>
+            </div>
+            <div class="testi-attr">
+              <div class="avatar">
+                <img src="/assets/co-conspirators/avatars/harry-moore.jpg" alt="Harry Moore" onerror="this.style.display='none'">
+                HM
+              </div>
+              <div class="who">
+                <div class="name">Harry Moore</div>
+                <div class="role">Director of Product <span class="at">@</span> Jet</div>
+              </div>
+              <div class="logos">
+                <span class="chip" title="Robinhood"><img src="/assets/co-conspirators/logos/robinhood.png" alt="Robinhood" onerror="this.style.display='none'">RBH</span>
+                <span class="chip" title="Jet"><img src="/assets/co-conspirators/logos/jet.png" alt="Jet" onerror="this.style.display='none'">JET</span>
+                <span class="chip" title="Google"><img src="/assets/co-conspirators/logos/google.png" alt="Google" onerror="this.style.display='none'">GGL</span>
+              </div>
+            </div>
+          </div>
+        </article>
+        <article class="testi">
+          <div class="testi-card">
+            <div class="testi-quote">
+              <p>It was awesome working with Chase. I could say a lot about his skills as a product manager — how he always brought in the voice of the customer, how he managed multiple projects and delivered with ease, how he inspired his peers and created a sense of team. But what I find more remarkable is Chase's character. He is trustworthy, straightforward, respectful and isn't afraid to speak his mind. I'd definitely work with Chase again if given the opportunity.</p>
+            </div>
+            <div class="testi-attr">
+              <div class="avatar">
+                <img src="/assets/co-conspirators/avatars/mark-powlen.jpg" alt="Mark Powlen" onerror="this.style.display='none'">
+                MP
+              </div>
+              <div class="who">
+                <div class="name">Mark Powlen</div>
+                <div class="role">Head of Product <span class="at">@</span> Tally</div>
+              </div>
+              <div class="logos">
+                <span class="chip" title="Meta"><img src="/assets/co-conspirators/logos/meta.png" alt="Meta" onerror="this.style.display='none'">MTA</span>
+                <span class="chip" title="Medium"><img src="/assets/co-conspirators/logos/medium.png" alt="Medium" onerror="this.style.display='none'">MED</span>
+                <span class="chip" title="Telegram"><img src="/assets/co-conspirators/logos/telegram.png" alt="Telegram" onerror="this.style.display='none'">TLG</span>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div class="testi-col narrow-col">
+        <article class="testi">
+          <div class="testi-card">
+            <div class="testi-quote">
+              <p>I worked with Chase as a fellow product manager at Jet, where my team was a downstream consumer of his team's market intelligence data. Chase was a key partner for me and a breath of fresh air — he instilled much-needed structure and roadmap prioritization to his team, and exuded competency and likability. Chase would contribute greatly to any organization and I'd highly recommend him.</p>
+            </div>
+            <div class="testi-attr">
+              <div class="avatar">
+                <img src="/assets/co-conspirators/avatars/jasmine-zhuang.jpg" alt="Jasmine Zhuang" onerror="this.style.display='none'">
+                JZ
+              </div>
+              <div class="who">
+                <div class="name">Jasmine Zhuang</div>
+                <div class="role">Senior Product Manager <span class="at">@</span> Jet</div>
+              </div>
+              <div class="logos">
+                <span class="chip" title="Workday"><img src="/assets/co-conspirators/logos/workday.png" alt="Workday" onerror="this.style.display='none'">WDY</span>
+                <span class="chip" title="Walmart"><img src="/assets/co-conspirators/logos/walmart.png" alt="Walmart" onerror="this.style.display='none'">WMT</span>
+                <span class="chip" title="Square"><img src="/assets/co-conspirators/logos/square.png" alt="Square" onerror="this.style.display='none'">SQ</span>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- 03 Engineering -->
+<section data-section-pin="03" data-section-label="Eng" data-screen-label="03 Engineering">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow"><span class="idx">03</span><span class="sep">—</span><span>Engineering</span></div>
+      <h2 class="section-title">On the <em>technical depth</em> required to ship together.</h2>
+    </div>
+
+    <div class="testi-grid">
+
+      <div class="testi-col anchor-col">
+        <article class="testi">
+          <div class="testi-card anchor">
+            <div class="testi-quote">
+              <p>I've worked for over a year with Chase in multiple different projects at Tally — from growth to retention, operations efficiency, and emergency COVID-related ones. And on all those I experienced his thoughtfulness and dedication to the team, the product, the customers, and the company. He could easily navigate in the ambiguities of both company goals and the uncharted waters of a pandemic.</p>
+              <p>As an engineer, my goal is to design a system that can handle the existing problem and, to some extent, consider what could come next. And in that sense, Chase was always there to lead and bring the business, the user experience and all other aspects of the product and the company into perspective. He understands that to succeed, the entire team needs to immerse into the problem.</p>
+              <p>Finally, and above all, Chase is an incredible human being. It'd be a pleasure to have the opportunity to work with him again in the future.</p>
+            </div>
+            <div class="testi-attr">
+              <div class="avatar">
+                <img src="/assets/co-conspirators/avatars/fred-ramos.jpg" alt="Fred Ramos" onerror="this.style.display='none'">
+                FR
+              </div>
+              <div class="who">
+                <div class="name">Fred Ramos</div>
+                <div class="role">Senior SWE <span class="at">@</span> Tally</div>
+              </div>
+              <div class="logos">
+                <span class="chip" title="Sphere"><img src="/assets/co-conspirators/logos/sphere.png" alt="Sphere" onerror="this.style.display='none'">SPH</span>
+                <span class="chip" title="Tally"><img src="/assets/co-conspirators/logos/tally.png" alt="Tally" onerror="this.style.display='none'">TLY</span>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div class="testi-col mid-col">
+        <article class="testi">
+          <div class="testi-card">
+            <div class="testi-quote">
+              <p>Chase is a great product manager who is no stranger to the technical details of working with software engineering teams. I had the pleasure of working for a year with him while at Tally and he has demonstrated his ability to dive deep into complexities in order to create simple and intuitive solutions to users. He is a creative thinker who remains unfazed through crises such as the COVID-19 pandemic, and maintains a healthy balance of humour and empathy within the team.</p>
+            </div>
+            <div class="testi-attr">
+              <div class="avatar">
+                <img src="/assets/co-conspirators/avatars/howard-tam.jpg" alt="Howard Tam" onerror="this.style.display='none'">
+                HT
+              </div>
+              <div class="who">
+                <div class="name">Howard Tam</div>
+                <div class="role">Senior SWE <span class="at">@</span> Tally</div>
+              </div>
+              <div class="logos">
+                <span class="chip" title="Amazon"><img src="/assets/co-conspirators/logos/amazon.png" alt="Amazon" onerror="this.style.display='none'">AMZ</span>
+                <span class="chip" title="Tally"><img src="/assets/co-conspirators/logos/tally.png" alt="Tally" onerror="this.style.display='none'">TLY</span>
+                <span class="chip" title="Cooee"><img src="/assets/co-conspirators/logos/cooee.png" alt="Cooee" onerror="this.style.display='none'">COO</span>
+              </div>
+            </div>
+          </div>
+        </article>
+        <article class="testi">
+          <div class="testi-card">
+            <div class="testi-quote">
+              <p>Chase and I worked together on the marketplace intelligence team at Jet. He joined shortly after the acquisition by Walmart, when we had to shift heavily to ingestion of Walmart data. While learning a new system is tough, learning a system in flux is particularly difficult. Chase was undaunted — he managed to absorb the new system, understand the lower-level technical details, and straighten things out with our new counterparts simultaneously. From his willingness to deep-dive into technical matters to roadmapping our next couple sprints with downstream teams, I really hope our paths cross again.</p>
+            </div>
+            <div class="testi-attr">
+              <div class="avatar">
+                <img src="/assets/co-conspirators/avatars/dylan-graham.jpg" alt="Dylan Graham" onerror="this.style.display='none'">
+                DG
+              </div>
+              <div class="who">
+                <div class="name">Dylan Graham</div>
+                <div class="role">SWE <span class="at">@</span> Jet.com</div>
+              </div>
+              <div class="logos">
+                <span class="chip" title="Meta"><img src="/assets/co-conspirators/logos/meta.png" alt="Meta" onerror="this.style.display='none'">MTA</span>
+                <span class="chip" title="NYT"><img src="/assets/co-conspirators/logos/nyt.png" alt="NYT" onerror="this.style.display='none'">NYT</span>
+                <span class="chip" title="Jet"><img src="/assets/co-conspirators/logos/jet.png" alt="Jet" onerror="this.style.display='none'">JET</span>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div class="testi-col narrow-col">
+        <article class="testi">
+          <div class="testi-card">
+            <div class="testi-quote">
+              <p>Chase's energy is contagious. He was able to identify key areas of focus, while balancing his own opinions with those of the team, which is a critical skill for a leader that is also a trusted member of the team. I do not see Chase ever backing down from a challenge, and the passion he brings to his initiatives is incredible.</p>
+            </div>
+            <div class="testi-attr">
+              <div class="avatar">
+                <img src="/assets/co-conspirators/avatars/justin-hundley.jpg" alt="Justin Hundley" onerror="this.style.display='none'">
+                JH
+              </div>
+              <div class="who">
+                <div class="name">Justin Hundley</div>
+                <div class="role">Front End Engineer <span class="at">@</span> Mischief</div>
+              </div>
+              <div class="logos">
+                <span class="chip" title="Robot Co"><img src="/assets/co-conspirators/logos/robot-co.png" alt="Robot Co" onerror="this.style.display='none'">RBT</span>
+                <span class="chip" title="Wave"><img src="/assets/co-conspirators/logos/wave.png" alt="Wave" onerror="this.style.display='none'">WAV</span>
+                <span class="chip" title="Marker"><img src="/assets/co-conspirators/logos/marker.png" alt="Marker" onerror="this.style.display='none'">MKR</span>
+              </div>
+            </div>
+          </div>
+        </article>
+        <article class="testi">
+          <div class="testi-card">
+            <div class="testi-quote">
+              <p>Chase was a pleasure to work with. I always felt like interactions with him were entirely ego-less, highly collaborative (where needed), and always with a foundation of humour, consideration and care. His empathy when it comes to user needs, plus his dogged focus on data points and metrics, made every decision and feature choice feel backed by fulfilling and meaningful motivations. He's super switched on, eager to learn, doesn't gate-keep and truly wants everyone to move forward as one.</p>
+            </div>
+            <div class="testi-attr">
+              <div class="avatar">
+                <img src="/assets/co-conspirators/avatars/ben-howdle.jpg" alt="Ben Howdle" onerror="this.style.display='none'">
+                BH
+              </div>
+              <div class="who">
+                <div class="name">Ben Howdle</div>
+                <div class="role">CTO <span class="at">@</span> WorkMade</div>
+              </div>
+              <div class="logos">
+                <span class="chip" title="Buffer"><img src="/assets/co-conspirators/logos/buffer.png" alt="Buffer" onerror="this.style.display='none'">BFR</span>
+                <span class="chip" title="Loop"><img src="/assets/co-conspirators/logos/loop.png" alt="Loop" onerror="this.style.display='none'">LOP</span>
+                <span class="chip" title="Codepen"><img src="/assets/co-conspirators/logos/codepen.png" alt="Codepen" onerror="this.style.display='none'">CDP</span>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- 04 Operations -->
+<section data-section-pin="04" data-section-label="Ops" data-screen-label="04 Operations">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow"><span class="idx">04</span><span class="sep">—</span><span>Operations</span></div>
+      <h2 class="section-title">On finding the <em>inefficiencies</em> and replacing them with something that scales.</h2>
+    </div>
+
+    <div class="testi-grid flipped">
+
+      <div class="testi-col anchor-col">
+        <article class="testi">
+          <div class="testi-card anchor">
+            <div class="testi-quote">
+              <p>Chase stands out at Jet for his ability to quickly find the inefficiencies in our internal processes and replace them with effective, scalable solutions that have helped Jet to become nimbler and more productive. He has proven very adept at breaking convoluted problems into discrete logical parts and finds the resources he needs to solve them.</p>
+              <p>Prior to Chase, Jet had no coherent system in place for running a product promotion end to end. Spanning supply chain, operations, marketing and sales, this is a complicated process with many moving parts and the need for cooperation from many different stakeholders. After running his first promotion event, Chase saw the need for a more structured process and took it upon himself to lead the effort to build a better solution.</p>
+              <p>His effort led to a much more scalable process that brought uniformity to how we run and track product promotions and provides transparency across the groups. Chase has proven very capable and intellectually curious, but importantly also very friendly and humble. He has been a pleasure to work with and will be a great asset to any firm.</p>
+            </div>
+            <div class="testi-attr">
+              <div class="avatar">
+                <img src="/assets/co-conspirators/avatars/francesco-balestra.jpg" alt="Francesco Balestra" onerror="this.style.display='none'">
+                FB
+              </div>
+              <div class="who">
+                <div class="name">Francesco Balestra</div>
+                <div class="role">Ops <span class="at">@</span> Jet.com</div>
+              </div>
+              <div class="logos">
+                <span class="chip" title="Comcast Ventures"><img src="/assets/co-conspirators/logos/comcast-ventures.png" alt="Comcast Ventures" onerror="this.style.display='none'">CMV</span>
+                <span class="chip" title="Jet"><img src="/assets/co-conspirators/logos/jet.png" alt="Jet" onerror="this.style.display='none'">JET</span>
+                <span class="chip" title="Blue Origin"><img src="/assets/co-conspirators/logos/blue-origin.png" alt="Blue Origin" onerror="this.style.display='none'">BLO</span>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div class="testi-col mid-col">
+        <article class="testi">
+          <div class="testi-card">
+            <div class="testi-quote">
+              <p>Chase and I started working at Jet during the same week, and we've worked closely on a number of projects, mostly related to product/brand ranking algorithms and promotion impact analysis. He's great to work with all around, but I'm particularly impressed by two things — (1) his ability to stay on top of things specific to his category while also keeping the bigger picture in mind, and (2) that he consistently works towards making a broad impact, whether or not he receives credit for it. He's a team player in a way that's rare these days.</p>
+            </div>
+            <div class="testi-attr">
+              <div class="avatar">
+                <img src="/assets/co-conspirators/avatars/sharat-alankar.jpg" alt="Sharat Alankar" onerror="this.style.display='none'">
+                SA
+              </div>
+              <div class="who">
+                <div class="name">Sharat Alankar</div>
+                <div class="role">Director of Analytics <span class="at">@</span> Jet</div>
+              </div>
+              <div class="logos">
+                <span class="chip" title="WeWork"><img src="/assets/co-conspirators/logos/wework.png" alt="WeWork" onerror="this.style.display='none'">WE</span>
+                <span class="chip" title="Walmart"><img src="/assets/co-conspirators/logos/walmart.png" alt="Walmart" onerror="this.style.display='none'">WMT</span>
+                <span class="chip" title="JPMorgan"><img src="/assets/co-conspirators/logos/jpmorgan.png" alt="JPMorgan" onerror="this.style.display='none'">JPM</span>
+              </div>
+            </div>
+          </div>
+        </article>
+        <article class="testi">
+          <div class="testi-card">
+            <div class="testi-quote">
+              <p>Chase is an absolute pleasure to work with. On every project I've worked on with him, he has been the glue of the team. I was always impressed by his ability to make data-driven decisions to execute on the product road map while managing multiple priorities and many different stakeholders. In addition to being a great product manager, he genuinely cares about his colleagues, goes above and beyond to help them succeed, and is so much fun to work with.</p>
+            </div>
+            <div class="testi-attr">
+              <div class="avatar">
+                <img src="/assets/co-conspirators/avatars/rachel-dao.jpg" alt="Rachel Dao" onerror="this.style.display='none'">
+                RD
+              </div>
+              <div class="who">
+                <div class="name">Rachel Dao</div>
+                <div class="role">Analytics <span class="at">@</span> Tally</div>
+              </div>
+              <div class="logos">
+                <span class="chip" title="Airbnb"><img src="/assets/co-conspirators/logos/airbnb.png" alt="Airbnb" onerror="this.style.display='none'">ABB</span>
+                <span class="chip" title="Tally"><img src="/assets/co-conspirators/logos/tally.png" alt="Tally" onerror="this.style.display='none'">TLY</span>
+                <span class="chip" title="LinkedIn"><img src="/assets/co-conspirators/logos/linkedin.png" alt="LinkedIn" onerror="this.style.display='none'">LNK</span>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div class="testi-col narrow-col">
+        <article class="testi">
+          <div class="testi-card">
+            <div class="testi-quote">
+              <p>Chase is an exceptional product leader to work with. During my time working with him, he's taken stakeholder involvement and cross-functional collaboration to the next level. Through his proactive and meticulous planning, he was able to bring transparency and clarity into the product development process while bringing departmental goals together. I would definitely recommend Chase since he is a great asset to a team.</p>
+            </div>
+            <div class="testi-attr">
+              <div class="avatar">
+                <img src="/assets/co-conspirators/avatars/christina-luk.jpg" alt="Christina Luk" onerror="this.style.display='none'">
+                CL
+              </div>
+              <div class="who">
+                <div class="name">Christina Luk</div>
+                <div class="role">Compliance Risk <span class="at">@</span> Tally</div>
+              </div>
+              <div class="logos">
+                <span class="chip" title="Nextdoor"><img src="/assets/co-conspirators/logos/nextdoor.png" alt="Nextdoor" onerror="this.style.display='none'">NXT</span>
+                <span class="chip" title="Tally"><img src="/assets/co-conspirators/logos/tally.png" alt="Tally" onerror="this.style.display='none'">TLY</span>
+                <span class="chip" title="Cal Berkeley"><img src="/assets/co-conspirators/logos/cal-berkeley.png" alt="Cal Berkeley" onerror="this.style.display='none'">CAL</span>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- End of trail -->
+<section class="endcap" data-section-pin="05" data-section-label="End" data-screen-label="05 End">
+  <div class="wrap">
+    <div class="eyebrow"><span>End of section</span></div>
+    <p class="line">Want to talk? Send a line and I'll meet you at the trailhead.</p>
+    <a class="mailto" href="mailto:chaseccroft@gmail.com">chaseccroft@gmail.com</a>
+  </div>
+</section>
+
+<div class="filebar">
+  <span>Chase Croft · Co-conspirators</span>
+  <span>Unlisted · noindex,nofollow</span>
+  <span id="filebarStamp">Direct link · v1</span>
+</div>
+
+<script>
+(function() {
+  // ---- Theme toggle ----
+  const root = document.documentElement;
+  const tBtn = document.getElementById('themeToggle');
+  const tLab = document.getElementById('themeLabel');
+  function applyTheme(t) {
+    root.setAttribute('data-theme', t);
+    tLab.textContent = (t === 'light') ? 'LIGHT' : 'DARK';
+    try { localStorage.setItem('theme', t); } catch(e) {}
+  }
+  let stored = null;
+  try { stored = localStorage.getItem('theme'); } catch(e) {}
+  const systemPref = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  applyTheme((stored === 'light' || stored === 'dark') ? stored : systemPref);
+  tBtn.addEventListener('click', () => {
+    applyTheme(root.getAttribute('data-theme') === 'light' ? 'dark' : 'light');
+  });
+
+  // ---- Last updated date ----
+  try {
+    const d = new Date();
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    document.getElementById('lastUpdated').textContent = `${months[d.getMonth()]} ${d.getFullYear()}`;
+  } catch(e) {}
+
+  // ---- Left rail ----
+  const railSvg = document.getElementById('railSvg');
+  const railPins = document.getElementById('railPins');
+  const railDot = document.getElementById('railDot');
+  const sectionsAll = Array.from(document.querySelectorAll('[data-section-pin]'));
+  const sections = sectionsAll.filter(s => s.getAttribute('data-section-pin') !== '00');
+  const pinNodes = [];
+
+  function rebuildPins() {
+    railPins.innerHTML = '';
+    pinNodes.length = 0;
+    const railRect = document.getElementById('rail').getBoundingClientRect();
+    railSvg.setAttribute('viewBox', `0 0 28 ${Math.max(railRect.height, 1)}`);
+    sections.forEach(sec => {
+      const r = sec.getBoundingClientRect();
+      const y = r.top - railRect.top + 40;
+      const idx = sec.getAttribute('data-section-pin');
+      const label = sec.getAttribute('data-section-label') || '';
+      const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      g.setAttribute('class', 'rail-pin');
+      g.setAttribute('transform', `translate(14 ${y})`);
+      g.innerHTML = `
+        <circle class="dot" r="3.2" cx="0" cy="0"></circle>
+        <circle class="ring" r="6" cx="0" cy="0"></circle>
+        <text class="label" x="14" y="3">${idx} · ${label}</text>
+      `;
+      railPins.appendChild(g);
+      pinNodes.push({ el: g, y, section: sec });
+    });
+  }
+
+  function update() {
+    const railRect = document.getElementById('rail').getBoundingClientRect();
+    const eyeY = window.innerHeight * 0.42 - railRect.top;
+    const maxY = railRect.height;
+    const dotY = Math.max(0, Math.min(maxY, eyeY));
+    railDot.setAttribute('cy', dotY);
+    railDot.style.opacity = (dotY < 40 || dotY > maxY - 20) ? 0 : 1;
+    pinNodes.forEach(p => p.el.classList.toggle('lit', dotY >= p.y - 4));
+  }
+
+  window.addEventListener('load', () => { rebuildPins(); update(); });
+  window.addEventListener('resize', () => { rebuildPins(); update(); }, { passive: true });
+  window.addEventListener('scroll', update, { passive: true });
+  rebuildPins(); update();
+})();
+</script>
+</body>
+</html>
