@@ -243,9 +243,22 @@
 /* ---- Analytics: WorkMade ---- */
 (function() {
   CC.watchTheme();
-  CC.watchBackLink();
 
-  // Back link
+  // Section views — label by the section-label text above each block
+  var blocks = Array.from(document.querySelectorAll('.section-label'));
+  CC.observeSections(blocks, function(el) {
+    return { section_id: el.textContent.trim(), section_name: el.textContent.replace('//', '').trim() };
+  });
+
+  // Gallery viewed — fires once when the photo grid scrolls into view
+  var gallery = document.querySelector('.photo-gallery');
+  if (gallery) {
+    CC.observeSections([gallery], function() {
+      return { section_id: 'gallery', section_name: 'Reference Gallery' };
+    });
+  }
+
+  // Back links (top nav + footer)
   document.querySelectorAll('.back-link').forEach(function(a) {
     a.addEventListener('click', function() {
       CC.track('Back Link Clicked', { destination: this.getAttribute('href') });
