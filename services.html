@@ -315,6 +315,7 @@
   .footer-inner a:hover { color: var(--accent); }
   .footer-links { display: flex; gap: 24px; }
 </style>
+<script src="/assets/analytics.js"></script>
 </head>
 <body>
 
@@ -633,6 +634,41 @@
     const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
     apply(next);
     try { localStorage.setItem('theme', next); } catch(e) {}
+  });
+})();
+</script>
+
+<script>
+/* ---- Analytics: Services ---- */
+(function() {
+  CC.watchTheme();
+  CC.watchBackLink();
+
+  // Section views
+  var sectionNames = ['Hero', 'Problems', 'Scopes', 'Route', 'CTA'];
+  var sections = Array.from(document.querySelectorAll('section'));
+  CC.observeSections(sections, function(el) {
+    var idx = sections.indexOf(el);
+    return { section_id: 'services_s' + idx, section_name: sectionNames[idx] || 'section_' + idx };
+  });
+
+  // Primary CTA — Start a conversation
+  var emailCta = document.querySelector('a.btn.primary[href^="mailto:"]');
+  if (emailCta) emailCta.addEventListener('click', function() {
+    CC.track('CTA Clicked', { label: this.textContent.trim(), location: 'services_cta', destination: 'mailto' });
+  });
+
+  // Secondary CTA — Grab a slot
+  var calLink = document.querySelector('a.cta-link[href*="cal.com"]');
+  if (calLink) calLink.addEventListener('click', function() {
+    CC.track('CTA Clicked', { label: this.textContent.trim(), location: 'services_cta', destination: this.href });
+  });
+
+  // Footer links
+  document.querySelectorAll('footer a, .footer-inner a').forEach(function(a) {
+    a.addEventListener('click', function() {
+      CC.track('Footer Link Clicked', { label: this.textContent.trim(), destination: this.getAttribute('href') });
+    });
   });
 })();
 </script>

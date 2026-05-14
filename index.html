@@ -1145,6 +1145,7 @@
     .scroll-cue .line { animation: none !important; }
   }
 </style>
+<script src="/assets/analytics.js"></script>
 </head>
 <body>
 
@@ -2581,6 +2582,65 @@
     } catch (e) {}
     setTimeout(() => topo.classList.remove('pixelated'), 3000);
   }
+})();
+</script>
+
+<script>
+/* ---- Analytics: Homepage ---- */
+(function() {
+  CC.watchTheme();
+  CC.watchBackLink();
+
+  // Section views (s0–s6)
+  var sectionNames = {
+    s0: 'Hero', s1: 'Kit', s2: 'Kit — Services',
+    s3: 'Trips Logged', s4: 'On the Mountain',
+    s5: 'Testimonials', s6: 'CTA'
+  };
+  CC.observeSections(
+    Array.from(document.querySelectorAll('section[id^="s"]')),
+    function(el) { return { section_id: el.id, section_name: sectionNames[el.id] || el.id }; }
+  );
+
+  // "See full services" buttons
+  document.querySelectorAll('a.btn[href="/services"]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var loc = this.closest('#s2') ? 'kit' : 'cta_block';
+      CC.track('CTA Clicked', { label: this.textContent.trim(), location: loc, destination: '/services' });
+    });
+  });
+
+  // "Start a conversation" email CTAs
+  document.querySelectorAll('a[href^="mailto:"]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      CC.track('CTA Clicked', { label: this.textContent.trim(), location: 'email', destination: 'mailto' });
+    });
+  });
+
+  // Snug CTA
+  var snugBtn = document.querySelector('a.btn.primary[href*="joinsnug"]');
+  if (snugBtn) snugBtn.addEventListener('click', function() {
+    CC.track('CTA Clicked', { label: this.textContent.trim(), location: 's4_snug', destination: this.href });
+  });
+
+  // Footer links
+  document.querySelectorAll('footer a').forEach(function(a) {
+    a.addEventListener('click', function() {
+      CC.track('Footer Link Clicked', { label: this.textContent.trim(), destination: this.getAttribute('href') });
+    });
+  });
+
+  // Case study / Trip Report clicks (delegated — cards render dynamically)
+  document.addEventListener('click', function(e) {
+    var link = e.target.closest('.trip-link[data-trip-index]');
+    if (!link) return;
+    var card = link.closest('[data-trip-index]') || link;
+    var name = card.querySelector('.trip-name');
+    CC.track('Case Study Clicked', {
+      project: name ? name.textContent.trim() : 'unknown',
+      index: link.getAttribute('data-trip-index')
+    });
+  });
 })();
 </script>
 </body>

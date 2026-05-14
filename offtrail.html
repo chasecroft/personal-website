@@ -561,6 +561,7 @@
     * { animation: none !important; }
   }
 </style>
+<script src="/assets/analytics.js"></script>
 </head>
 <body>
 
@@ -1014,6 +1015,39 @@ sheetClose.addEventListener('click', closeSheet);
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && sheetOpen) closeSheet();
 });
+</script>
+
+<script>
+/* ---- Analytics: Off-trail ---- */
+(function() {
+  CC.watchTheme();
+  CC.watchBackLink();
+
+  // Section views — s1 Currently, s2 Hobbies, s3 Topics, s4 Travel
+  var sectionNames = { s1: 'Currently', s2: 'Hobbies', s3: 'Topics', s4: 'Travel' };
+  CC.observeSections(
+    Array.from(document.querySelectorAll('section[id]')),
+    function(el) { return { section_id: el.id, section_name: sectionNames[el.id] || el.id }; }
+  );
+
+  // Country clicks — patch openSheet to fire before it runs
+  var _openSheet = window.openSheet;
+  window.openSheet = function(iso) {
+    var country = window.COUNTRY_DATA && (COUNTRY_DATA[iso] || COUNTRY_DATA[iso.toUpperCase()]);
+    CC.track('Country Clicked', {
+      country_code: iso,
+      country_name: country ? country.name : iso,
+      visited: country ? !!country.visited : null
+    });
+    return _openSheet.apply(this, arguments);
+  };
+
+  // Footer link
+  var footerLink = document.querySelector('footer a');
+  if (footerLink) footerLink.addEventListener('click', function() {
+    CC.track('Footer Link Clicked', { label: this.textContent.trim(), destination: this.getAttribute('href') });
+  });
+})();
 </script>
 </body>
 </html>

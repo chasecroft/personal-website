@@ -122,6 +122,7 @@
   }
   .footer-credit { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.12em; color: var(--ink-faint); }
 </style>
+<script src="/assets/analytics.js"></script>
 </head>
 <body>
 
@@ -234,6 +235,21 @@
     const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
     apply(next);
     try { localStorage.setItem('theme', next); } catch(e) {}
+  });
+})();
+</script>
+
+<script>
+/* ---- Analytics: WorkMade ---- */
+(function() {
+  CC.watchTheme();
+  CC.watchBackLink();
+
+  // Back link
+  document.querySelectorAll('.back-link').forEach(function(a) {
+    a.addEventListener('click', function() {
+      CC.track('Back Link Clicked', { destination: this.getAttribute('href') });
+    });
   });
 })();
 </script>

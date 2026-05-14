@@ -246,6 +246,7 @@
     * { animation: none !important; transition: none !important; }
   }
 </style>
+<script src="/assets/analytics.js"></script>
 </head>
 <body>
 
@@ -893,6 +894,30 @@
     const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     document.getElementById('lastUpdated').textContent = `${months[d.getMonth()]} ${d.getFullYear()}`;
   } catch(e) {}
+})();
+</script>
+
+<script>
+/* ---- Analytics: Co-conspirators ---- */
+(function() {
+  CC.watchTheme();
+  CC.watchBackLink();
+
+  // Section views — 01 Design through 04 Operations + endcap
+  var sectionNames = { '01': 'Design', '02': 'Product Management', '03': 'Engineering', '04': 'Operations', '05': 'End' };
+  CC.observeSections(
+    Array.from(document.querySelectorAll('[data-section-pin]')),
+    function(el) {
+      var pin = el.getAttribute('data-section-pin');
+      return { section_id: pin, section_name: sectionNames[pin] || el.getAttribute('data-section-label') || pin };
+    }
+  );
+
+  // Contact email at the endcap
+  var emailLink = document.querySelector('a.mailto');
+  if (emailLink) emailLink.addEventListener('click', function() {
+    CC.track('Contact Email Clicked', { destination: 'mailto' });
+  });
 })();
 </script>
 </body>
